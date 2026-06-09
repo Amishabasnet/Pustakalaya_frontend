@@ -1,4 +1,5 @@
 import 'package:go_router/go_router.dart';
+import 'package:pustakalaya/features/onboarding/presentation/pages/onboarding_screen.dart';
 import 'package:pustakalaya/features/splash/presentation/pages/splash_screen.dart';
 
 class AppRouter {
@@ -11,6 +12,10 @@ class AppRouter {
     initialLocation: splash,
     routes: [
       GoRoute(path: splash, builder: (context, state) => const SplashScreen()),
+      GoRoute(
+        path: onboarding,
+        builder: (context, state) => const OnboardingScreen(),
+      ),
     ],
   );
 }
