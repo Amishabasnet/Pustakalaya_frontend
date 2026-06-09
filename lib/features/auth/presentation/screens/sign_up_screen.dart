@@ -113,7 +113,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(10),
                       border: Border.all(
-                        color: AppColors.textMedium.withOpacity(0.2),
+                        color: AppColors.textMedium.withValues(alpha: 0.2),
                       ),
                     ),
                     child: const Icon(
