@@ -1,5 +1,5 @@
 import 'package:go_router/go_router.dart';
-import 'package:pustakalaya/features/splash/presentation/screens/splash_screen.dart';
+import 'package:pustakalaya/features/splash/presentation/pages/splash_screen.dart';
 
 class AppRouter {
   AppRouter._();
