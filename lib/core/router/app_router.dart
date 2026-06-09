@@ -18,4 +18,6 @@ class AppRouter {
       ),
     ],
   );
+
+  static String get signIn => null;
 }
