@@ -19,7 +19,7 @@ extension OrderStatusX on OrderStatus {
 
 class OrderItem {
   final String id;
-  final String orderNumber;
+  final String orderNumber; 
   final String bookTitle;
   final String bookAuthor;
   final String coverColor;

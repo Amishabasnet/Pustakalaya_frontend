@@ -4,6 +4,7 @@ import 'package:pustakalaya/features/orders/data/repositories/orders_repository_
 import 'package:pustakalaya/features/orders/domain/entities/order_item.dart';
 import 'package:pustakalaya/features/orders/domain/repositories/orders_repository.dart';
 
+
 final ordersRepositoryProvider = Provider<OrdersRepository>(
   (ref) => OrdersRepositoryImpl(),
 );
@@ -21,9 +22,13 @@ final filteredOrdersProvider = Provider<AsyncValue<List<OrderItem>>>((ref) {
   return ordersAsync.whenData((orders) {
     switch (tab) {
       case 1:
-        return orders.where((o) => o.status == OrderStatus.processing).toList();
+        return orders
+            .where((o) => o.status == OrderStatus.processing)
+            .toList();
       case 2:
-        return orders.where((o) => o.status == OrderStatus.delivered).toList();
+        return orders
+            .where((o) => o.status == OrderStatus.delivered)
+            .toList();
       default:
         return orders;
     }

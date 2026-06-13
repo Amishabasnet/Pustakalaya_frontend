@@ -1,92 +1,172 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../../../../core/constants/app_colors.dart';
-import '../providers/orders_provider.dart';
-import '../widgets/order_card.dart';
-import '../widgets/order_tab_bar.dart';
+import 'package:pustakalaya/core/constants/app_colors.dart';
+import 'package:pustakalaya/features/orders/domain/entities/order_item.dart';
+import 'package:pustakalaya/features/orders/presentation/providers/orders_provider.dart';
+import 'package:pustakalaya/features/orders/presentation/widgets/order_card.dart';
+import 'package:pustakalaya/features/orders/presentation/widgets/order_tab_bar.dart';
 
-class MyOrdersScreen extends ConsumerWidget {
+
+class MyOrdersScreen extends ConsumerStatefulWidget {
   const MyOrdersScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<MyOrdersScreen> createState() => _MyOrdersScreenState();
+}
+
+class _MyOrdersScreenState extends ConsumerState<MyOrdersScreen> {
+  late final PageController _pageController;
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController(
+      initialPage: ref.read(orderTabProvider),
+    );
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  void _onTabTap(int index) {
+    ref.read(orderTabProvider.notifier).state = index;
+    _pageController.animateToPage(
+      index,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final activeTab = ref.watch(orderTabProvider);
-    final filteredAsync = ref.watch(filteredOrdersProvider);
+    final ordersAsync = ref.watch(ordersProvider);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5EDE3),
+      backgroundColor: const Color(0xFFFAF0EA),
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(20, 28, 20, 0),
-              child: Text(
-                'My orders',
-                textAlign: TextAlign.center,
-                style: GoogleFonts.playfairDisplay(
-                  fontSize: 24,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.textDark,
-                ),
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  Text(
+                    'My orders',
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.playfairDisplay(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.textDark,
+                    ),
+                  ),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: GestureDetector(
+                      onTap: () => Navigator.of(context).maybePop(),
+                      child: Container(
+                        width: 36,
+                        height: 36,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(10),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.06),
+                              blurRadius: 6,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: const Icon(
+                          Icons.arrow_back_ios_new_rounded,
+                          size: 15,
+                          color: AppColors.textDark,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
 
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
-              child: Container(
-                decoration: const BoxDecoration(
-                  border: Border(
-                    bottom: BorderSide(color: Color(0xFFE0D5CA), width: 1.2),
-                  ),
-                ),
-                child: OrderTabBar(
-                  activeIndex: activeTab,
-                  onTap: (i) => ref.read(orderTabProvider.notifier).state = i,
+            const SizedBox(height: 20),
+
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: 16),
+              decoration: const BoxDecoration(
+                border: Border(
+                  bottom: BorderSide(color: Color(0xFFE8DDD5), width: 1.2),
                 ),
               ),
+              child: OrderTabBar(
+                activeIndex: activeTab,
+                onTap: _onTabTap,
+              ),
             ),
+
+            const SizedBox(height: 12),
 
             Expanded(
-              child: filteredAsync.when(
-                data: (orders) {
-                  if (orders.isEmpty) {
-                    return _EmptyState(activeTab: activeTab);
-                  }
-                  return ListView.builder(
-                    physics: const BouncingScrollPhysics(),
-                    padding: const EdgeInsets.only(top: 16, bottom: 24),
-                    itemCount: orders.length,
-                    itemBuilder: (context, i) => OrderCard(
-                      order: orders[i],
-                      onTap: () {
-                        // Navigate to order detail
-                      },
-                    ),
+              child: ordersAsync.when(
+                data: (allOrders) {
+                  // Pre-filter lists for each tab
+                  final processingOrders = allOrders
+                      .where((o) => o.status.isProcessing)
+                      .toList();
+                  final deliveredOrders = allOrders
+                      .where((o) => o.status.isDelivered)
+                      .toList();
+
+                  final pages = [allOrders, processingOrders, deliveredOrders];
+
+                  return PageView.builder(
+                    controller: _pageController,
+                    itemCount: 3,
+                    onPageChanged: (i) =>
+                        ref.read(orderTabProvider.notifier).state = i,
+                    itemBuilder: (context, pageIndex) {
+                      final orders = pages[pageIndex];
+                      if (orders.isEmpty) {
+                        return _EmptyState(tabIndex: pageIndex);
+                      }
+                      return ListView.builder(
+                        physics: const BouncingScrollPhysics(),
+                        padding: const EdgeInsets.only(
+                            top: 4, bottom: 24),
+                        itemCount: orders.length,
+                        itemBuilder: (_, i) => OrderCard(
+                          order: orders[i],
+                          onTap: () {
+                          },
+                        ),
+                      );
+                    },
                   );
                 },
                 loading: () => ListView.builder(
-                  padding: const EdgeInsets.only(top: 16),
+                  padding: const EdgeInsets.only(top: 4),
                   itemCount: 3,
                   itemBuilder: (_, __) => const _ShimmerOrderCard(),
                 ),
-                error: (e, _) => Center(
+                error: (_, __) => Center(
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(
-                        Icons.error_outline_rounded,
-                        size: 48,
-                        color: AppColors.textMedium.withOpacity(0.4),
-                      ),
+                      Icon(Icons.error_outline_rounded,
+                          size: 52,
+                          color: AppColors.textMedium.withOpacity(0.35)),
                       const SizedBox(height: 12),
                       Text(
-                        'Failed to load orders',
+                        'Could not load orders',
                         style: GoogleFonts.lato(
-                          fontSize: 14,
-                          color: AppColors.textMedium,
-                        ),
+                            fontSize: 14, color: AppColors.textMedium),
                       ),
                     ],
                   ),
@@ -101,55 +181,73 @@ class MyOrdersScreen extends ConsumerWidget {
 }
 
 class _EmptyState extends StatelessWidget {
-  final int activeTab;
-  const _EmptyState({required this.activeTab});
+  final int tabIndex;
+  const _EmptyState({required this.tabIndex});
 
-  String get _message {
-    switch (activeTab) {
+  String get _title {
+    switch (tabIndex) {
       case 1:
-        return 'No orders being processed';
+        return 'No orders in processing';
       case 2:
         return 'No delivered orders yet';
       default:
-        return 'You haven\'t placed any orders yet';
+        return 'No orders placed yet';
+    }
+  }
+
+  String get _subtitle {
+    switch (tabIndex) {
+      case 1:
+        return 'Orders being processed will show here';
+      case 2:
+        return 'Your completed orders will appear here';
+      default:
+        return 'Browse books and place your first order!';
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 90,
-            height: 90,
-            decoration: BoxDecoration(
-              color: AppColors.primary.withOpacity(0.1),
-              shape: BoxShape.circle,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 88,
+              height: 88,
+              decoration: BoxDecoration(
+                color: AppColors.primary.withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                tabIndex == 2
+                    ? Icons.local_shipping_outlined
+                    : Icons.shopping_bag_outlined,
+                size: 40,
+                color: AppColors.primary.withOpacity(0.7),
+              ),
             ),
-            child: Icon(
-              Icons.shopping_bag_outlined,
-              size: 40,
-              color: AppColors.primary.withOpacity(0.7),
+            const SizedBox(height: 20),
+            Text(
+              _title,
+              textAlign: TextAlign.center,
+              style: GoogleFonts.playfairDisplay(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: AppColors.textDark,
+              ),
             ),
-          ),
-          const SizedBox(height: 20),
-          Text(
-            _message,
-            style: GoogleFonts.playfairDisplay(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              color: AppColors.textDark,
+            const SizedBox(height: 8),
+            Text(
+              _subtitle,
+              textAlign: TextAlign.center,
+              style: GoogleFonts.lato(
+                  fontSize: 13, color: AppColors.textMedium),
             ),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Your orders will appear here',
-            style: GoogleFonts.lato(fontSize: 13, color: AppColors.textMedium),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -171,10 +269,11 @@ class _ShimmerOrderCardState extends State<_ShimmerOrderCard>
   void initState() {
     super.initState();
     _ctrl = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 900),
-    )..repeat(reverse: true);
-    _anim = Tween(begin: 0.4, end: 0.9).animate(_ctrl);
+        vsync: this, duration: const Duration(milliseconds: 900))
+      ..repeat(reverse: true);
+    _anim = Tween(begin: 0.4, end: 0.85).animate(
+      CurvedAnimation(parent: _ctrl, curve: Curves.easeInOut),
+    );
   }
 
   @override
@@ -188,11 +287,11 @@ class _ShimmerOrderCardState extends State<_ShimmerOrderCard>
     return AnimatedBuilder(
       animation: _anim,
       builder: (_, __) => Container(
-        margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-        height: 118,
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 7),
+        height: 108,
         decoration: BoxDecoration(
           color: Colors.grey[300]!.withOpacity(_anim.value),
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(14),
         ),
       ),
     );

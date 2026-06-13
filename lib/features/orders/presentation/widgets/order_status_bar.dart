@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:pustakalaya/features/orders/domain/entities/order_item.dart';
+import '../../domain/entities/order_item.dart';
 
+/// Text-only status label (no background fill) — matches screenshot exactly
 class OrderStatusBadge extends StatelessWidget {
   final OrderStatus status;
 
@@ -9,37 +10,25 @@ class OrderStatusBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Color bgColor;
     final Color textColor;
-
     switch (status) {
       case OrderStatus.processing:
-        bgColor = const Color(0xFFFFEBD6);
-        textColor = const Color(0xFFE8602C);
+        textColor = const Color(0xFFE8602C); // orange
         break;
       case OrderStatus.delivered:
-        bgColor = const Color(0xFFD4F4E2);
-        textColor = const Color(0xFF1E8449);
+        textColor = const Color(0xFF27AE60); // green
         break;
       case OrderStatus.cancelled:
-        bgColor = const Color(0xFFFFE0E0);
-        textColor = const Color(0xFFC0392B);
+        textColor = const Color(0xFFC0392B); // red
         break;
     }
 
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-      decoration: BoxDecoration(
-        color: bgColor,
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Text(
-        status.label,
-        style: GoogleFonts.lato(
-          fontSize: 11,
-          fontWeight: FontWeight.w700,
-          color: textColor,
-        ),
+    return Text(
+      status.label,
+      style: GoogleFonts.lato(
+        fontSize: 12,
+        fontWeight: FontWeight.w600,
+        color: textColor,
       ),
     );
   }

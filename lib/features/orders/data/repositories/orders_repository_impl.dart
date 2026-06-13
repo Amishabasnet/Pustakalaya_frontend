@@ -1,5 +1,5 @@
-import 'package:pustakalaya/features/orders/domain/entities/order_item.dart';
-import 'package:pustakalaya/features/orders/domain/repositories/orders_repository.dart';
+import '../../domain/entities/order_item.dart';
+import '../../domain/repositories/orders_repository.dart';
 
 class OrdersRepositoryImpl implements OrdersRepository {
   @override
