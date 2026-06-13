@@ -1,7 +1,6 @@
 import 'package:go_router/go_router.dart';
 import 'package:pustakalaya/features/auth/presentation/screens/sign_in_screen.dart';
 import 'package:pustakalaya/features/auth/presentation/screens/sign_up_screen.dart';
-import 'package:pustakalaya/features/book_detail/presentation/screens/book_detail_screen.dart';
 import 'package:pustakalaya/features/cart/presentation/screens/cart_screen.dart';
 import 'package:pustakalaya/features/filter/presentation/screens/filter_screen.dart';
 import 'package:pustakalaya/features/navbar/app_shell.dart';
