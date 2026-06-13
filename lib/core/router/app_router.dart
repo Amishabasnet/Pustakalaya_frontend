@@ -25,6 +25,13 @@ class AppRouter {
   static const String checkout       = '/checkout';
   static const String confirmation   = '/confirmation';
   static const String notifications  = '/notifications';
+  static const String splash = '/';
+  static const String onboarding = '/onboarding';
+  static const String signUp = '/sign-up';
+  static const String signIn = '/sign-in';
+  static const String home = '/home';
+  static const String myOrders = '/my-orders';
+  static const String bookDetail = '/book-detail';
 
   static final router = GoRouter(
     initialLocation: splash,
@@ -69,6 +76,13 @@ class AppRouter {
       ),
       GoRoute(path: notifications,
           builder: (_, __) => const NotificationsScreen()),
+      GoRoute(path: splash, builder: (_, __) => const SplashScreen()),
+      GoRoute(path: onboarding, builder: (_, __) => const OnboardingScreen()),
+      GoRoute(path: signUp, builder: (_, __) => const SignUpScreen()),
+      GoRoute(path: signIn, builder: (_, __) => const SignInScreen()),
+      GoRoute(path: home, builder: (_, __) => const AppShell()),
+      GoRoute(path: myOrders, builder: (_, __) => const MyOrdersScreen()),
+      GoRoute(path: bookDetail, builder: (_, __) => const BookDetailScreen()),
     ],
   );
 }
