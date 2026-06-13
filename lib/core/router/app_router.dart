@@ -6,6 +6,7 @@ import 'package:pustakalaya/features/cart/presentation/screens/cart_screen.dart'
 import 'package:pustakalaya/features/cart/presentation/screens/checkout/checkout_screen.dart';
 import 'package:pustakalaya/features/cart/presentation/screens/checkout/confirmation_screen.dart';
 import 'package:pustakalaya/features/navbar/app_shell.dart';
+import 'package:pustakalaya/features/notifications/presentation/screens/notifications_screen.dart';
 import 'package:pustakalaya/features/onboarding/presentation/pages/onboarding_screen.dart';
 import 'package:pustakalaya/features/orders/presentation/screens/my_orders_screen.dart';
 import 'package:pustakalaya/features/splash/presentation/pages/splash_screen.dart';
