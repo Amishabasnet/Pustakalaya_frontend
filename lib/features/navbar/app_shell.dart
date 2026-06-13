@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:pustakalaya/features/cart/presentation/screens/cart_screen.dart';
 import 'package:pustakalaya/features/home/presentation/screens/home_screen.dart';
+import 'package:pustakalaya/features/profile/presentation/screens/profile_screen.dart';
 import 'package:pustakalaya/features/wishlist/presentation/screens/wishlist_screen.dart';
 
 import 'nav_provider.dart';

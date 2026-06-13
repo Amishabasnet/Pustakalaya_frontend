@@ -1,6 +1,7 @@
 import 'package:go_router/go_router.dart';
 import 'package:pustakalaya/features/auth/presentation/screens/sign_in_screen.dart';
 import 'package:pustakalaya/features/auth/presentation/screens/sign_up_screen.dart';
+import 'package:pustakalaya/features/navbar/app_shell.dart';
 import 'package:pustakalaya/features/onboarding/presentation/pages/onboarding_screen.dart';
 import 'package:pustakalaya/features/splash/presentation/pages/splash_screen.dart';
 
@@ -11,6 +12,8 @@ class AppRouter {
   static const String onboarding = '/onboarding';
   static const String signUp = '/sign-up';
   static const String signIn = '/sign-in';
+  static const String home = '/home';
+  static const String myOrders = '/my-orders';
 
   static final router = GoRouter(
     initialLocation: splash,
@@ -22,6 +25,7 @@ class AppRouter {
       ),
       GoRoute(path: signUp, builder: (context, state) => const SignUpScreen()),
       GoRoute(path: signIn, builder: (context, state) => const SignInScreen()),
+      GoRoute(path: home, builder: (context, state) => const AppShell()),
     ],
   );
 }
