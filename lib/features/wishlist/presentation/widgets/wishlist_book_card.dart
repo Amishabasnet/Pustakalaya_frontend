@@ -33,7 +33,7 @@ class WishlistBookCard extends ConsumerWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.06),
+            color: Colors.black.withValues(alpha: 0.06),
             blurRadius: 12,
             offset: const Offset(0, 3),
           ),
@@ -106,7 +106,7 @@ class WishlistBookCard extends ConsumerWidget {
                 height: 38,
                 margin: const EdgeInsets.only(left: 8),
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withOpacity(0.08),
+                  color: AppColors.primary.withValues(alpha: 0.08),
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(
@@ -158,7 +158,7 @@ class _BookCover extends StatelessWidget {
             // Spine
             Container(
               width: 6,
-              color: Colors.black.withOpacity(0.18),
+              color: Colors.black.withValues(alpha: 0.18),
             ),
             // Decorative circle
             Positioned(
@@ -169,7 +169,7 @@ class _BookCover extends StatelessWidget {
                 height: 52,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: Colors.white.withOpacity(0.08),
+                  color: Colors.white.withValues(alpha: 0.08),
                 ),
               ),
             ),
@@ -196,7 +196,7 @@ class _BookCover extends StatelessWidget {
                     item.book.author,
                     style: GoogleFonts.lato(
                       fontSize: 7,
-                      color: textColor.withOpacity(0.75),
+                      color: textColor.withValues(alpha: 0.75),
                       fontWeight: FontWeight.w500,
                     ),
                     maxLines: 1,

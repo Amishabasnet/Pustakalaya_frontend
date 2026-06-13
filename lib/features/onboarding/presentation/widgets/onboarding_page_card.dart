@@ -33,13 +33,13 @@ class OnboardingPageCard extends StatelessWidget {
             height: 200,
             margin: const EdgeInsets.only(bottom: 52),
             decoration: BoxDecoration(
-              color: AppColors.primary.withOpacity(0.08),
+              color: AppColors.primary.withValues(alpha: 0.08),
               borderRadius: BorderRadius.circular(24),
             ),
             child: Icon(
               _icons[index % _icons.length],
               size: 80,
-              color: AppColors.primary.withOpacity(0.6),
+              color: AppColors.primary.withValues(alpha: 0.6),
             ),
           ),
 

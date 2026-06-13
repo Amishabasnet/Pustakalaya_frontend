@@ -35,7 +35,7 @@ class OrderCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.06),
+              color: Colors.black.withValues(alpha: 0.06),
               blurRadius: 12,
               offset: const Offset(0, 3),
             ),
@@ -65,7 +65,7 @@ class OrderCard extends StatelessWidget {
                 child: Stack(
                   children: [
                     // Spine
-                    Container(width: 6, color: Colors.black.withOpacity(0.18)),
+                    Container(width: 6, color: Colors.black.withValues(alpha: 0.18)),
                     // Decorative circle
                     Positioned(
                       top: -14,
@@ -75,7 +75,7 @@ class OrderCard extends StatelessWidget {
                         height: 50,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: Colors.white.withOpacity(0.08),
+                          color: Colors.white.withValues(alpha: 0.08),
                         ),
                       ),
                     ),
@@ -101,7 +101,7 @@ class OrderCard extends StatelessWidget {
                             order.bookAuthor,
                             style: GoogleFonts.lato(
                               fontSize: 6.5,
-                              color: textOnCover.withOpacity(0.75),
+                              color: textOnCover.withValues(alpha: 0.75),
                               fontWeight: FontWeight.w500,
                             ),
                             maxLines: 1,

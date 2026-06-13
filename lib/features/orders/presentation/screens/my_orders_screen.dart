@@ -78,7 +78,7 @@ class _MyOrdersScreenState extends ConsumerState<MyOrdersScreen> {
                           borderRadius: BorderRadius.circular(10),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.06),
+                              color: Colors.black.withValues(alpha: 0.06),
                               blurRadius: 6,
                               offset: const Offset(0, 2),
                             ),
@@ -153,15 +153,15 @@ class _MyOrdersScreenState extends ConsumerState<MyOrdersScreen> {
                 loading: () => ListView.builder(
                   padding: const EdgeInsets.only(top: 4),
                   itemCount: 3,
-                  itemBuilder: (_, __) => const _ShimmerOrderCard(),
+                  itemBuilder: (_, _) => const _ShimmerOrderCard(),
                 ),
-                error: (_, __) => Center(
+                error: (_, _) => Center(
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Icon(Icons.error_outline_rounded,
                           size: 52,
-                          color: AppColors.textMedium.withOpacity(0.35)),
+                          color: AppColors.textMedium.withValues(alpha: 0.35)),
                       const SizedBox(height: 12),
                       Text(
                         'Could not load orders',
@@ -218,7 +218,7 @@ class _EmptyState extends StatelessWidget {
               width: 88,
               height: 88,
               decoration: BoxDecoration(
-                color: AppColors.primary.withOpacity(0.1),
+                color: AppColors.primary.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(
@@ -226,7 +226,7 @@ class _EmptyState extends StatelessWidget {
                     ? Icons.local_shipping_outlined
                     : Icons.shopping_bag_outlined,
                 size: 40,
-                color: AppColors.primary.withOpacity(0.7),
+                color: AppColors.primary.withValues(alpha: 0.7),
               ),
             ),
             const SizedBox(height: 20),
@@ -286,11 +286,11 @@ class _ShimmerOrderCardState extends State<_ShimmerOrderCard>
   Widget build(BuildContext context) {
     return AnimatedBuilder(
       animation: _anim,
-      builder: (_, __) => Container(
+      builder: (_, _) => Container(
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 7),
         height: 108,
         decoration: BoxDecoration(
-          color: Colors.grey[300]!.withOpacity(_anim.value),
+          color: Colors.grey[300]!.withValues(alpha: _anim.value),
           borderRadius: BorderRadius.circular(14),
         ),
       ),

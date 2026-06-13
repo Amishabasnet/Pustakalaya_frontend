@@ -21,13 +21,13 @@ class AppRouter {
   static final router = GoRouter(
     initialLocation: splash,
     routes: [
-      GoRoute(path: splash, builder: (_, __) => const SplashScreen()),
-      GoRoute(path: onboarding, builder: (_, __) => const OnboardingScreen()),
-      GoRoute(path: signUp, builder: (_, __) => const SignUpScreen()),
-      GoRoute(path: signIn, builder: (_, __) => const SignInScreen()),
-      GoRoute(path: home, builder: (_, __) => const AppShell()),
-      GoRoute(path: myOrders, builder: (_, __) => const MyOrdersScreen()),
-      GoRoute(path: bookDetail, builder: (_, __) => const BookDetailScreen()),
+      GoRoute(path: splash, builder: (_, _) => const SplashScreen()),
+      GoRoute(path: onboarding, builder: (_, _) => const OnboardingScreen()),
+      GoRoute(path: signUp, builder: (_, _) => const SignUpScreen()),
+      GoRoute(path: signIn, builder: (_, _) => const SignInScreen()),
+      GoRoute(path: home, builder: (_, _) => const AppShell()),
+      GoRoute(path: myOrders, builder: (_, _) => const MyOrdersScreen()),
+      GoRoute(path: bookDetail, builder: (_, _) => const BookDetailScreen()),
     ],
   );
 }

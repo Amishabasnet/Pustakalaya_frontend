@@ -132,7 +132,7 @@ class HomeScreen extends ConsumerWidget {
                             borderRadius: BorderRadius.circular(12),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.06),
+                                color: Colors.black.withValues(alpha: 0.06),
                                 blurRadius: 8,
                                 offset: const Offset(0, 2),
                               ),
@@ -143,7 +143,7 @@ class HomeScreen extends ConsumerWidget {
                               const SizedBox(width: 14),
                               Icon(
                                 Icons.search_rounded,
-                                color: AppColors.textMedium.withOpacity(0.55),
+                                color: AppColors.textMedium.withValues(alpha: 0.55),
                                 size: 20,
                               ),
                               const SizedBox(width: 8),
@@ -151,7 +151,7 @@ class HomeScreen extends ConsumerWidget {
                                 'Search books',
                                 style: GoogleFonts.lato(
                                   fontSize: 14,
-                                  color: AppColors.textMedium.withOpacity(0.55),
+                                  color: AppColors.textMedium.withValues(alpha: 0.55),
                                 ),
                               ),
                             ],
@@ -225,7 +225,7 @@ class HomeScreen extends ConsumerWidget {
                   physics: const BouncingScrollPhysics(),
                   padding: EdgeInsets.symmetric(horizontal: _hPad(screenW)),
                   itemCount: books.length,
-                  separatorBuilder: (_, __) => const SizedBox(width: 14),
+                  separatorBuilder: (_, _) => const SizedBox(width: 14),
                   itemBuilder: (_, i) => FeaturedBookCard(book: books[i]),
                 ),
               ),
@@ -235,14 +235,14 @@ class HomeScreen extends ConsumerWidget {
                   scrollDirection: Axis.horizontal,
                   padding: EdgeInsets.symmetric(horizontal: _hPad(screenW)),
                   itemCount: 3,
-                  separatorBuilder: (_, __) => const SizedBox(width: 14),
-                  itemBuilder: (_, __) => _ShimmerCard(
+                  separatorBuilder: (_, _) => const SizedBox(width: 14),
+                  itemBuilder: (_, _) => _ShimmerCard(
                     width: screenW * 0.42,
                     height: _featuredHeight(screenW),
                   ),
                 ),
               ),
-              error: (_, __) => const SizedBox.shrink(),
+              error: (_, _) => const SizedBox.shrink(),
             ),
           ),
 
@@ -301,7 +301,7 @@ class HomeScreen extends ConsumerWidget {
                   ),
                 ),
               ),
-              error: (_, __) => const SizedBox.shrink(),
+              error: (_, _) => const SizedBox.shrink(),
             ),
           ),
 
@@ -355,12 +355,12 @@ class _ShimmerCardState extends State<_ShimmerCard>
   Widget build(BuildContext context) {
     return AnimatedBuilder(
       animation: _anim,
-      builder: (_, __) => Container(
+      builder: (_, _) => Container(
         width: widget.width,
         height: widget.height,
         margin: const EdgeInsets.only(bottom: 12),
         decoration: BoxDecoration(
-          color: Colors.grey[300]!.withOpacity(_anim.value),
+          color: Colors.grey[300]!.withValues(alpha: _anim.value),
           borderRadius: BorderRadius.circular(14),
         ),
       ),

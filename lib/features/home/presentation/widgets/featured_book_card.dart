@@ -32,7 +32,7 @@ class FeaturedBookCard extends ConsumerWidget {
         borderRadius: BorderRadius.circular(14),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.07),
+            color: Colors.black.withValues(alpha: 0.07),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -67,7 +67,7 @@ class FeaturedBookCard extends ConsumerWidget {
                       width: 30,
                       height: 30,
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.9),
+                        color: Colors.white.withValues(alpha: 0.9),
                         shape: BoxShape.circle,
                       ),
                       child: Icon(
@@ -175,7 +175,7 @@ class _BookCoverIllustration extends StatelessWidget {
               height: 90,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Colors.white.withOpacity(0.08),
+                color: Colors.white.withValues(alpha: 0.08),
               ),
             ),
           ),
@@ -187,7 +187,7 @@ class _BookCoverIllustration extends StatelessWidget {
               height: 70,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Colors.white.withOpacity(0.06),
+                color: Colors.white.withValues(alpha: 0.06),
               ),
             ),
           ),
@@ -198,7 +198,7 @@ class _BookCoverIllustration extends StatelessWidget {
             bottom: 0,
             child: Container(
               width: 8,
-              color: Colors.black.withOpacity(0.2),
+              color: Colors.black.withValues(alpha: 0.2),
             ),
           ),
           // Title on cover
@@ -223,14 +223,14 @@ class _BookCoverIllustration extends StatelessWidget {
                 Container(
                   height: 1.5,
                   width: 32,
-                  color: Colors.white.withOpacity(0.5),
+                  color: Colors.white.withValues(alpha: 0.5),
                 ),
                 const SizedBox(height: 8),
                 Text(
                   book.author,
                   style: GoogleFonts.lato(
                     fontSize: 10,
-                    color: Colors.white.withOpacity(0.85),
+                    color: Colors.white.withValues(alpha: 0.85),
                     fontWeight: FontWeight.w500,
                     letterSpacing: 0.5,
                   ),

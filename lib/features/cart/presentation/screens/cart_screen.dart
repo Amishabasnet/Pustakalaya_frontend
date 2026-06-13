@@ -46,7 +46,7 @@ class CartScreen extends ConsumerWidget {
                         'Clear all',
                         style: GoogleFonts.lato(
                           fontSize: 12,
-                          color: Colors.white.withOpacity(0.85),
+                          color: Colors.white.withValues(alpha: 0.85),
                           decoration: TextDecoration.underline,
                           decorationColor: Colors.white,
                         ),
@@ -66,7 +66,7 @@ class CartScreen extends ConsumerWidget {
                     Icon(
                       Icons.shopping_cart_outlined,
                       size: 72,
-                      color: AppColors.primary.withOpacity(0.3),
+                      color: AppColors.primary.withValues(alpha: 0.3),
                     ),
                     const SizedBox(height: 16),
                     Text(
@@ -126,7 +126,7 @@ class CartScreen extends ConsumerWidget {
                         borderRadius: BorderRadius.circular(14),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.05),
+                            color: Colors.black.withValues(alpha: 0.05),
                             blurRadius: 8,
                             offset: const Offset(0, 2),
                           ),
@@ -203,7 +203,7 @@ class CartScreen extends ConsumerWidget {
                               Container(
                                 decoration: BoxDecoration(
                                   border: Border.all(
-                                    color: AppColors.primary.withOpacity(0.3),
+                                    color: AppColors.primary.withValues(alpha: 0.3),
                                   ),
                                   borderRadius: BorderRadius.circular(8),
                                 ),
@@ -262,7 +262,7 @@ class CartScreen extends ConsumerWidget {
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
-                      color: AppColors.primary.withOpacity(0.3),
+                      color: AppColors.primary.withValues(alpha: 0.3),
                       style: BorderStyle.solid,
                     ),
                   ),
@@ -271,7 +271,7 @@ class CartScreen extends ConsumerWidget {
                       Icon(
                         Icons.local_offer_outlined,
                         size: 18,
-                        color: AppColors.primary.withOpacity(0.7),
+                        color: AppColors.primary.withValues(alpha: 0.7),
                       ),
                       const SizedBox(width: 10),
                       Expanded(
@@ -280,7 +280,7 @@ class CartScreen extends ConsumerWidget {
                             hintText: 'Enter promo code',
                             hintStyle: GoogleFonts.lato(
                               fontSize: 13,
-                              color: AppColors.textMedium.withOpacity(0.5),
+                              color: AppColors.textMedium.withValues(alpha: 0.5),
                             ),
                             border: InputBorder.none,
                           ),
@@ -319,7 +319,7 @@ class CartScreen extends ConsumerWidget {
                     borderRadius: BorderRadius.circular(14),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.04),
+                        color: Colors.black.withValues(alpha: 0.04),
                         blurRadius: 8,
                         offset: const Offset(0, 2),
                       ),
