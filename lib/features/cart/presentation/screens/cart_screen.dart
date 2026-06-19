@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pustakalaya/core/constants/app_colors.dart';
 import 'package:pustakalaya/features/cart/presentation/providers/cart_provider.dart';
+import 'package:pustakalaya/features/wishlist/presentation/providers/wishlist_provider.dart';
+
 
 class CartScreen extends ConsumerWidget {
   const CartScreen({super.key});
@@ -11,33 +13,34 @@ class CartScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final items = ref.watch(cartProvider);
     final total = ref.watch(cartTotalProvider);
-    const deliveryFee = 80.0;
-    const discount = 50.0;
-    final grandTotal = total + deliveryFee - discount;
+    final wishlistItems = ref.watch(wishlistProvider);
+    const deliveryFee = 120.0;
+    final grandTotal = total + deliveryFee;
+    final screenW = MediaQuery.of(context).size.width;
+    final hPad = screenW > 600 ? 32.0 : 16.0;
 
     return Scaffold(
-      backgroundColor: AppColors.background,
-      body: CustomScrollView(
-        slivers: [
-          // Header
-          SliverAppBar(
-            backgroundColor: AppColors.primary,
-            expandedHeight: 110,
-            pinned: true,
-            automaticallyImplyLeading: false,
-            flexibleSpace: FlexibleSpaceBar(
-              titlePadding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
-              title: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.end,
+      backgroundColor: const Color(0xFFFAF0EA),
+      body: SafeArea(
+        child: Column(
+          children: [
+            Container(
+              color: Colors.white,
+              padding: EdgeInsets.symmetric(horizontal: hPad, vertical: 14),
+              child: Row(
                 children: [
-                  Text(
-                    'My Cart',
-                    style: GoogleFonts.playfairDisplay(
-                      fontSize: 22,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.white,
-                    ),
+                  _AppBarBtn(
+                    icon: Icons.arrow_back_ios_new_rounded,
+                    onTap: () => Navigator.of(context).maybePop(),
+                  ),
+                  Expanded(
+                    child: Text('Cart',
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.playfairDisplay(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.textDark,
+                        )),
                   ),
                   if (items.isNotEmpty)
                     GestureDetector(
@@ -46,7 +49,7 @@ class CartScreen extends ConsumerWidget {
                         'Clear all',
                         style: GoogleFonts.lato(
                           fontSize: 12,
-                          color: Colors.white.withValues(alpha: 0.85),
+                          color: Colors.white.withOpacity(0.85),
                           decoration: TextDecoration.underline,
                           decorationColor: Colors.white,
                         ),
@@ -66,7 +69,7 @@ class CartScreen extends ConsumerWidget {
                     Icon(
                       Icons.shopping_cart_outlined,
                       size: 72,
-                      color: AppColors.primary.withValues(alpha: 0.3),
+                      color: AppColors.primary.withOpacity(0.3),
                     ),
                     const SizedBox(height: 16),
                     Text(
@@ -126,7 +129,7 @@ class CartScreen extends ConsumerWidget {
                         borderRadius: BorderRadius.circular(14),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.05),
+                            color: Colors.black.withOpacity(0.05),
                             blurRadius: 8,
                             offset: const Offset(0, 2),
                           ),
@@ -203,7 +206,7 @@ class CartScreen extends ConsumerWidget {
                               Container(
                                 decoration: BoxDecoration(
                                   border: Border.all(
-                                    color: AppColors.primary.withValues(alpha: 0.3),
+                                    color: AppColors.primary.withOpacity(0.3),
                                   ),
                                   borderRadius: BorderRadius.circular(8),
                                 ),
@@ -262,7 +265,7 @@ class CartScreen extends ConsumerWidget {
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
-                      color: AppColors.primary.withValues(alpha: 0.3),
+                      color: AppColors.primary.withOpacity(0.3),
                       style: BorderStyle.solid,
                     ),
                   ),
@@ -271,7 +274,7 @@ class CartScreen extends ConsumerWidget {
                       Icon(
                         Icons.local_offer_outlined,
                         size: 18,
-                        color: AppColors.primary.withValues(alpha: 0.7),
+                        color: AppColors.primary.withOpacity(0.7),
                       ),
                       const SizedBox(width: 10),
                       Expanded(
@@ -280,7 +283,7 @@ class CartScreen extends ConsumerWidget {
                             hintText: 'Enter promo code',
                             hintStyle: GoogleFonts.lato(
                               fontSize: 13,
-                              color: AppColors.textMedium.withValues(alpha: 0.5),
+                              color: AppColors.textMedium.withOpacity(0.5),
                             ),
                             border: InputBorder.none,
                           ),
@@ -319,7 +322,7 @@ class CartScreen extends ConsumerWidget {
                     borderRadius: BorderRadius.circular(14),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.04),
+                        color: Colors.black.withOpacity(0.04),
                         blurRadius: 8,
                         offset: const Offset(0, 2),
                       ),
@@ -412,16 +415,14 @@ class CartScreen extends ConsumerWidget {
   }
 }
 
-class _StepperBtn extends StatelessWidget {
+class _Btn extends StatelessWidget {
   final IconData icon;
   final VoidCallback onTap;
   final bool filled;
-
-  const _StepperBtn({
-    required this.icon,
-    required this.onTap,
-    this.filled = false,
-  });
+  const _Btn(
+      {required this.icon,
+      required this.onTap,
+      this.filled = false});
 
   @override
   Widget build(BuildContext context) {
@@ -434,55 +435,44 @@ class _StepperBtn extends StatelessWidget {
           color: filled ? AppColors.primary : Colors.transparent,
           borderRadius: BorderRadius.circular(7),
         ),
-        child: Icon(
-          icon,
-          size: 14,
-          color: filled ? Colors.white : AppColors.textMedium,
-        ),
+        child: Icon(icon,
+            size: 14,
+            color: filled ? Colors.white : AppColors.textMedium),
       ),
     );
   }
 }
 
-class _SummaryRow extends StatelessWidget {
-  final String label;
-  final String value;
-  final bool isDiscount;
-  final bool isTotal;
-
-  const _SummaryRow({
-    required this.label,
-    required this.value,
-    this.isDiscount = false,
-    this.isTotal = false,
-  });
-
+class _EmptyState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          label,
-          style: GoogleFonts.lato(
-            fontSize: isTotal ? 15 : 13,
-            fontWeight: isTotal ? FontWeight.w700 : FontWeight.w400,
-            color: isTotal ? AppColors.textDark : AppColors.textMedium,
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 88,
+            height: 88,
+            decoration: BoxDecoration(
+              color: AppColors.primary.withOpacity(0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(Icons.shopping_cart_outlined,
+                size: 44,
+                color: AppColors.primary.withOpacity(0.7)),
           ),
-        ),
-        Text(
-          value,
-          style: GoogleFonts.lato(
-            fontSize: isTotal ? 15 : 13,
-            fontWeight: isTotal ? FontWeight.w700 : FontWeight.w500,
-            color: isDiscount
-                ? Colors.green
-                : isTotal
-                ? AppColors.primary
-                : AppColors.textDark,
-          ),
-        ),
-      ],
+          const SizedBox(height: 18),
+          Text('Your cart is empty',
+              style: GoogleFonts.playfairDisplay(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.textDark)),
+          const SizedBox(height: 8),
+          Text('Add books from the Book Detail page!',
+              style: GoogleFonts.lato(
+                  fontSize: 13, color: AppColors.textMedium)),
+        ],
+      ),
     );
   }
 }
