@@ -6,7 +6,6 @@ import 'package:pustakalaya/features/filter/domain/entities/filter_state.dart';
 import 'package:pustakalaya/features/filter/presentation/providers/filter_provider.dart';
 import 'package:pustakalaya/features/filter/presentation/widgets/filter_tab_content.dart';
 
-
 class FilterScreen extends ConsumerStatefulWidget {
   const FilterScreen({super.key});
 
@@ -24,8 +23,7 @@ class _FilterScreenState extends ConsumerState<FilterScreen>
   void initState() {
     super.initState();
     final initialTab = ref.read(filterProvider).activeTab;
-    _pageController =
-        PageController(initialPage: _tabs.indexOf(initialTab));
+    _pageController = PageController(initialPage: _tabs.indexOf(initialTab));
   }
 
   @override
@@ -76,14 +74,12 @@ class _FilterScreenState extends ConsumerState<FilterScreen>
                         Align(
                           alignment: Alignment.centerLeft,
                           child: GestureDetector(
-                            onTap: () =>
-                                Navigator.of(context).maybePop(),
+                            onTap: () => Navigator.of(context).maybePop(),
                             child: Container(
                               width: 36,
                               height: 36,
                               decoration: BoxDecoration(
-                                color:
-                                    AppColors.primary.withOpacity(0.1),
+                                color: AppColors.primary.withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               child: const Icon(
@@ -121,7 +117,9 @@ class _FilterScreenState extends ConsumerState<FilterScreen>
                     decoration: const BoxDecoration(
                       border: Border(
                         bottom: BorderSide(
-                            color: Color(0xFFEEE5DC), width: 1.2),
+                          color: Color(0xFFEEE5DC),
+                          width: 1.2,
+                        ),
                       ),
                     ),
                     child: Row(
@@ -136,10 +134,10 @@ class _FilterScreenState extends ConsumerState<FilterScreen>
                               children: [
                                 Padding(
                                   padding: const EdgeInsets.symmetric(
-                                      vertical: 12),
+                                    vertical: 12,
+                                  ),
                                   child: AnimatedDefaultTextStyle(
-                                    duration:
-                                        const Duration(milliseconds: 200),
+                                    duration: const Duration(milliseconds: 200),
                                     style: GoogleFonts.lato(
                                       fontSize: 14,
                                       fontWeight: selected
@@ -157,8 +155,7 @@ class _FilterScreenState extends ConsumerState<FilterScreen>
                                 ),
                                 // Active underline
                                 AnimatedContainer(
-                                  duration:
-                                      const Duration(milliseconds: 220),
+                                  duration: const Duration(milliseconds: 220),
                                   height: 2.5,
                                   decoration: BoxDecoration(
                                     color: selected
@@ -191,8 +188,12 @@ class _FilterScreenState extends ConsumerState<FilterScreen>
 
             Container(
               color: Colors.white,
-              padding: EdgeInsets.fromLTRB(hPad, 14, hPad,
-                  MediaQuery.of(context).padding.bottom + 14),
+              padding: EdgeInsets.fromLTRB(
+                hPad,
+                14,
+                hPad,
+                MediaQuery.of(context).padding.bottom + 14,
+              ),
               child: Row(
                 children: [
                   // Reset button
@@ -207,9 +208,9 @@ class _FilterScreenState extends ConsumerState<FilterScreen>
                               : const Color(0xFFDDD5CC),
                         ),
                         shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12)),
-                        padding:
-                            const EdgeInsets.symmetric(vertical: 14),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 14),
                       ),
                       child: Text(
                         'Reset',
@@ -229,16 +230,19 @@ class _FilterScreenState extends ConsumerState<FilterScreen>
                     flex: 2,
                     child: ElevatedButton(
                       onPressed: () {
-                        // Pop back to search with filter applied
-                        Navigator.of(context).maybePop(filter);
+                        // Filters are applied reactively via filterProvider,
+                        // which searchResultsProvider/filteredBrowseProvider
+                        // in the search feature already watch — so all we
+                        // need to do here is return to the Search screen.
+                        Navigator.of(context).maybePop();
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primary,
                         shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12)),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                         elevation: 0,
-                        padding:
-                            const EdgeInsets.symmetric(vertical: 14),
+                        padding: const EdgeInsets.symmetric(vertical: 14),
                       ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -256,9 +260,11 @@ class _FilterScreenState extends ConsumerState<FilterScreen>
                             const SizedBox(width: 8),
                             Container(
                               padding: const EdgeInsets.symmetric(
-                                  horizontal: 7, vertical: 2),
+                                horizontal: 7,
+                                vertical: 2,
+                              ),
                               decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.3),
+                                color: Colors.white.withValues(alpha: 0.3),
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               child: Text(

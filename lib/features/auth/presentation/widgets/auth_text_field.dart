@@ -54,7 +54,7 @@ class _AuthTextFieldState extends State<AuthTextField> {
             hintText: widget.hint,
             hintStyle: GoogleFonts.lato(
               fontSize: 14,
-              color: AppColors.textMedium.withOpacity(0.6),
+              color: AppColors.textMedium.withValues(alpha: 0.6),
             ),
             filled: true,
             fillColor: Colors.white,
@@ -65,13 +65,13 @@ class _AuthTextFieldState extends State<AuthTextField> {
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
               borderSide: BorderSide(
-                color: AppColors.textMedium.withOpacity(0.3),
+                color: AppColors.textMedium.withValues(alpha: 0.3),
               ),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
               borderSide: BorderSide(
-                color: AppColors.textMedium.withOpacity(0.3),
+                color: AppColors.textMedium.withValues(alpha: 0.3),
               ),
             ),
             focusedBorder: OutlineInputBorder(

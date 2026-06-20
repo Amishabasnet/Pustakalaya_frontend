@@ -17,8 +17,7 @@ class WeakPasswordFailure extends AuthFailure {
 }
 
 class ServerFailure extends AuthFailure {
-  const ServerFailure([String msg = 'Something went wrong. Please try again.'])
-    : super(msg);
+  const ServerFailure([super.msg = 'Something went wrong. Please try again.']);
 }
 
 class NetworkFailure extends AuthFailure {

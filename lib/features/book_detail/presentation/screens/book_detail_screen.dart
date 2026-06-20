@@ -107,6 +107,7 @@ class BookDetailScreen extends ConsumerWidget {
                                       fontSize: 11,
                                       fontWeight: FontWeight.w600,
                                       color:
+                                          textOnCover.withValues(alpha: 0.75),
                                           textOnCover.withOpacity(0.75),
                                       letterSpacing: 2.5,
                                     ),
@@ -218,6 +219,7 @@ class BookDetailScreen extends ConsumerWidget {
                               height: 36,
                               decoration: BoxDecoration(
                                 color: isWishlisted
+                                    ? AppColors.primary.withValues(alpha: 0.1)
                                     ? AppColors.primary.withOpacity(0.1)
                                     : Colors.transparent,
                                 shape: BoxShape.circle,
@@ -247,6 +249,7 @@ class BookDetailScreen extends ConsumerWidget {
                               label: 'Verified Seller',
                               iconColor: const Color(0xFF27AE60),
                               borderColor:
+                                  const Color(0xFF27AE60).withValues(alpha: 0.4),
                                   const Color(0xFF27AE60).withOpacity(0.4),
                               textColor: const Color(0xFF27AE60),
                             ),
@@ -255,6 +258,7 @@ class BookDetailScreen extends ConsumerWidget {
                             label: '${book.rating} rating',
                             iconColor: const Color(0xFFE8A020),
                             borderColor:
+                                const Color(0xFFE8A020).withValues(alpha: 0.4),
                                 const Color(0xFFE8A020).withOpacity(0.4),
                             textColor: AppColors.textDark,
                           ),
@@ -262,6 +266,7 @@ class BookDetailScreen extends ConsumerWidget {
                             _BadgeChip(
                               label: 'In Stock',
                               borderColor:
+                                  const Color(0xFF2E86AB).withValues(alpha: 0.4),
                                   const Color(0xFF2E86AB).withOpacity(0.4),
                               textColor: const Color(0xFF2E86AB),
                             ),
@@ -387,6 +392,7 @@ class BookDetailScreen extends ConsumerWidget {
                 color: Colors.white,
                 boxShadow: [
                   BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.08),
                     color: Colors.black.withOpacity(0.08),
                     blurRadius: 16,
                     offset: const Offset(0, -4),
@@ -472,6 +478,7 @@ class _AppBarBtn extends StatelessWidget {
         width: 36,
         height: 36,
         decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.25),
           color: Colors.white.withOpacity(0.25),
           borderRadius: BorderRadius.circular(10),
         ),
@@ -542,6 +549,7 @@ class _DecorCircle extends StatelessWidget {
       height: size,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
+        color: Colors.white.withValues(alpha: opacity),
         color: Colors.white.withOpacity(opacity),
       ),
     );

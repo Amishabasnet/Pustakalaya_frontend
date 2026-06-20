@@ -69,8 +69,8 @@ class PustakalayaNavBar extends StatelessWidget {
                           selected ? item.activeIcon : item.inactiveIcon,
                           key: ValueKey(selected),
                           size: 26,
-                          color: Colors.white.withOpacity(
-                            selected ? 1.0 : 0.65,
+                          color: Colors.white.withValues(
+                            alpha: selected ? 1.0 : 0.65,
                           ),
                         ),
                       ),
@@ -82,8 +82,8 @@ class PustakalayaNavBar extends StatelessWidget {
                           fontWeight: selected
                               ? FontWeight.w700
                               : FontWeight.w400,
-                          color: Colors.white.withOpacity(
-                            selected ? 1.0 : 0.65,
+                          color: Colors.white.withValues(
+                            alpha: selected ? 1.0 : 0.65,
                           ),
                         ),
                       ),

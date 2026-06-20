@@ -28,7 +28,7 @@ class StarRatingRow extends StatelessWidget {
               size: size,
               color: filled
                   ? const Color(0xFFE8A020)
-                  : AppColors.primary.withOpacity(0.45),
+                  : AppColors.primary.withValues(alpha: 0.45),
             ),
           ),
         );

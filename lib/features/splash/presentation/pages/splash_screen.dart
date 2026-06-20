@@ -65,7 +65,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                   height: 72,
                   margin: const EdgeInsets.only(bottom: 28),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.18),
+                    color: Colors.white.withValues(alpha: 0.18),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: const Icon(

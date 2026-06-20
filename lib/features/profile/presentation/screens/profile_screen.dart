@@ -35,7 +35,7 @@ class ProfileScreen extends ConsumerWidget {
                         width: 84,
                         height: 84,
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.25),
+                          color: Colors.white.withValues(alpha: 0.25),
                           shape: BoxShape.circle,
                           border: Border.all(color: Colors.white, width: 2.5),
                         ),
@@ -83,7 +83,7 @@ class ProfileScreen extends ConsumerWidget {
                     profile.email,
                     style: GoogleFonts.lato(
                       fontSize: 13,
-                      color: Colors.white.withOpacity(0.8),
+                      color: Colors.white.withValues(alpha: 0.8),
                     ),
                   ),
                   const SizedBox(height: 20),
@@ -181,7 +181,7 @@ class ProfileScreen extends ConsumerWidget {
                         trailing: Switch(
                           value: false,
                           onChanged: (_) {},
-                          activeColor: AppColors.primary,
+                          activeThumbColor: AppColors.primary,
                           materialTapTargetSize:
                               MaterialTapTargetSize.shrinkWrap,
                         ),
@@ -272,7 +272,7 @@ class _StatBadge extends StatelessWidget {
           label,
           style: GoogleFonts.lato(
             fontSize: 11,
-            color: Colors.white.withOpacity(0.8),
+            color: Colors.white.withValues(alpha: 0.8),
           ),
         ),
       ],
@@ -286,7 +286,7 @@ class _StatDivider extends StatelessWidget {
     return Container(
       height: 28,
       width: 1,
-      color: Colors.white.withOpacity(0.3),
+      color: Colors.white.withValues(alpha: 0.3),
     );
   }
 }
@@ -339,7 +339,7 @@ class _MenuCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(14),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -360,7 +360,7 @@ class _MenuCard extends StatelessWidget {
                   width: 36,
                   height: 36,
                   decoration: BoxDecoration(
-                    color: AppColors.primary.withOpacity(0.1),
+                    color: AppColors.primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(9),
                   ),
                   child: Icon(item.icon, size: 18, color: AppColors.primary),
@@ -410,7 +410,7 @@ class _MenuCard extends StatelessWidget {
                         Icon(
                           Icons.chevron_right_rounded,
                           size: 18,
-                          color: AppColors.textMedium.withOpacity(0.5),
+                          color: AppColors.textMedium.withValues(alpha: 0.5),
                         ),
                       ],
                     ),
@@ -419,7 +419,7 @@ class _MenuCard extends StatelessWidget {
                 Divider(
                   height: 1,
                   indent: 68,
-                  color: AppColors.textMedium.withOpacity(0.1),
+                  color: AppColors.textMedium.withValues(alpha: 0.1),
                 ),
             ],
           );

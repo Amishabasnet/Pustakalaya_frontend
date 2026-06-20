@@ -26,7 +26,7 @@ class StarRatingSelector extends StatelessWidget {
             margin: const EdgeInsets.only(right: 8),
             decoration: BoxDecoration(
               color: isSelected
-                  ? AppColors.primary.withOpacity(0.12)
+                  ? AppColors.primary.withValues(alpha: 0.12)
                   : Colors.white,
               borderRadius: BorderRadius.circular(8),
               border: Border.all(

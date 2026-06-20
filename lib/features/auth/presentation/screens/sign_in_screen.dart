@@ -153,7 +153,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                           borderRadius: BorderRadius.circular(4),
                         ),
                         side: BorderSide(
-                          color: AppColors.textMedium.withOpacity(0.5),
+                          color: AppColors.textMedium.withValues(alpha: 0.5),
                         ),
                       ),
                     ),

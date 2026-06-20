@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pustakalaya/core/constants/app_colors.dart';
+import 'package:pustakalaya/core/router/app_router.dart';
 import 'package:pustakalaya/features/cart/presentation/providers/cart_provider.dart';
 import 'package:pustakalaya/features/wishlist/presentation/providers/wishlist_provider.dart';
 
-
 class CartScreen extends ConsumerWidget {
-  const CartScreen({super.key});
+  final bool showBackButton;
+
+  const CartScreen({super.key, this.showBackButton = true});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -29,10 +32,12 @@ class CartScreen extends ConsumerWidget {
               padding: EdgeInsets.symmetric(horizontal: hPad, vertical: 14),
               child: Row(
                 children: [
-                  _AppBarBtn(
-                    icon: Icons.arrow_back_ios_new_rounded,
-                    onTap: () => Navigator.of(context).maybePop(),
-                  ),
+                  showBackButton
+                      ? _AppBarBtn(
+                          icon: Icons.arrow_back_ios_new_rounded,
+                          onTap: () => Navigator.of(context).maybePop(),
+                        )
+                      : const SizedBox(width: 36),
                   Expanded(
                     child: Text('Cart',
                         textAlign: TextAlign.center,
@@ -148,7 +153,7 @@ class CartScreen extends ConsumerWidget {
                 height: 52,
                 child: ElevatedButton(
                   onPressed: () =>
-                      _showCheckoutSheet(context, ref, grandTotal),
+                      _showProceedDialog(context, ref, grandTotal),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     shape: RoundedRectangleBorder(
@@ -246,75 +251,108 @@ class CartScreen extends ConsumerWidget {
     );
   }
 
-  void _showCheckoutSheet(
+  void _showProceedDialog(
       BuildContext context, WidgetRef ref, double grandTotal) {
-    showModalBottomSheet(
+    showDialog(
       context: context,
-      backgroundColor: Colors.white,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-          borderRadius:
-              BorderRadius.vertical(top: Radius.circular(24))),
-      builder: (_) => Padding(
-        padding: EdgeInsets.only(
-          left: 24,
-          right: 24,
-          top: 16,
-          bottom: MediaQuery.of(context).viewInsets.bottom + 32,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Center(
-              child: Container(
-                width: 40,
-                height: 4,
+      barrierDismissible: true,
+      builder: (ctx) => Dialog(
+        backgroundColor: Colors.transparent,
+        insetPadding:
+            const EdgeInsets.symmetric(horizontal: 28, vertical: 24),
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                  color: Colors.black.withOpacity(0.12),
+                  blurRadius: 24,
+                  offset: const Offset(0, 8))
+            ],
+          ),
+          padding: const EdgeInsets.all(28),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Icon
+              Container(
+                width: 64,
+                height: 64,
                 decoration: BoxDecoration(
-                    color: Colors.grey[300],
-                    borderRadius: BorderRadius.circular(2)),
+                  color: AppColors.primary.withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.shopping_cart_checkout_rounded,
+                    size: 32, color: AppColors.primary),
               ),
-            ),
-            const SizedBox(height: 20),
-            Text('Order Placed! 🎉',
+              const SizedBox(height: 18),
+              // Title
+              Text(
+                'Proceed to Checkout?',
                 style: GoogleFonts.playfairDisplay(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.textDark)),
-            const SizedBox(height: 8),
-            Text(
-              'Your order has been placed successfully.\n'
-              'Total: NRs. ${grandTotal.toStringAsFixed(0)}.\n'
-              'Estimated delivery in 3–5 business days.',
-              style: GoogleFonts.lato(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.textDark,
+                ),
+              ),
+              const SizedBox(height: 10),
+              // Subtitle
+              Text(
+                'Are you sure you want to proceed\nwith your order?',
+                textAlign: TextAlign.center,
+                style: GoogleFonts.lato(
                   fontSize: 13,
                   color: AppColors.textMedium,
-                  height: 1.6),
-            ),
-            const SizedBox(height: 24),
-            SizedBox(
-              width: double.infinity,
-              height: 50,
-              child: ElevatedButton(
-                onPressed: () {
-                  ref.read(cartProvider.notifier).clear();
-                  Navigator.pop(context);
-                  Navigator.of(context).maybePop();
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12)),
-                  elevation: 0,
+                  height: 1.6,
                 ),
-                child: Text('Continue Shopping',
-                    style: GoogleFonts.lato(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.white)),
               ),
-            ),
-          ],
+              const SizedBox(height: 26),
+              // Buttons
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => Navigator.pop(ctx),
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(
+                            color: AppColors.primary),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10)),
+                        padding:
+                            const EdgeInsets.symmetric(vertical: 14),
+                      ),
+                      child: Text('Cancel',
+                          style: GoogleFonts.lato(
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.primary)),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(ctx);
+                        context.push(AppRouter.checkout);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10)),
+                        elevation: 0,
+                        padding:
+                            const EdgeInsets.symmetric(vertical: 14),
+                      ),
+                      child: Text('Yes, Proceed',
+                          style: GoogleFonts.lato(
+                              fontWeight: FontWeight.w700,
+                              color: Colors.white)),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );

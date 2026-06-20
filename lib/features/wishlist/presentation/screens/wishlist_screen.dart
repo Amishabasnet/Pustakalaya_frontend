@@ -56,7 +56,7 @@ class _WishlistScreenState extends ConsumerState<WishlistScreen> {
                   borderRadius: BorderRadius.circular(28),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.06),
+                      color: Colors.black.withValues(alpha: 0.06),
                       blurRadius: 10,
                       offset: const Offset(0, 2),
                     ),
@@ -68,7 +68,7 @@ class _WishlistScreenState extends ConsumerState<WishlistScreen> {
                     Icon(
                       Icons.search_rounded,
                       size: 20,
-                      color: AppColors.textMedium.withOpacity(0.55),
+                      color: AppColors.textMedium.withValues(alpha: 0.55),
                     ),
                     const SizedBox(width: 10),
                     Expanded(
@@ -85,7 +85,7 @@ class _WishlistScreenState extends ConsumerState<WishlistScreen> {
                           hintText: 'Search saved books',
                           hintStyle: GoogleFonts.lato(
                             fontSize: 14,
-                            color: AppColors.textMedium.withOpacity(0.55),
+                            color: AppColors.textMedium.withValues(alpha: 0.55),
                           ),
                           border: InputBorder.none,
                           isDense: true,
@@ -175,7 +175,7 @@ class _EmptyState extends StatelessWidget {
             width: 88,
             height: 88,
             decoration: BoxDecoration(
-              color: AppColors.primary.withOpacity(0.1),
+              color: AppColors.primary.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
             child: const Icon(
@@ -218,7 +218,7 @@ class _NoResultsState extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(Icons.search_off_rounded,
-              size: 56, color: AppColors.textMedium.withOpacity(0.4)),
+              size: 56, color: AppColors.textMedium.withValues(alpha: 0.4)),
           const SizedBox(height: 16),
           Text(
             'No results for "$query"',

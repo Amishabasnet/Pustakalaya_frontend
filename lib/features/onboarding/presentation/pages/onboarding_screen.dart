@@ -86,7 +86,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                       '${state.currentIndex + 1}/${pages.length}',
                       style: AppTextStyles.onboardingBody.copyWith(
                         fontWeight: FontWeight.w600,
-                        color: AppColors.primary.withOpacity(0.6),
+                        color: AppColors.primary.withValues(alpha: 0.6),
                       ),
                     ),
                   ),

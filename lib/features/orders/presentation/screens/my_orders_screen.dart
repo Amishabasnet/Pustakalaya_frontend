@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:pustakalaya/core/constants/app_colors.dart';
+import 'package:pustakalaya/core/router/app_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pustakalaya/core/constants/app_colors.dart';
 import 'package:pustakalaya/features/orders/domain/entities/order_item.dart';
@@ -21,6 +25,7 @@ class _MyOrdersScreenState extends ConsumerState<MyOrdersScreen> {
   @override
   void initState() {
     super.initState();
+    _pageController = PageController(initialPage: ref.read(orderTabProvider));
     _pageController = PageController(
       initialPage: ref.read(orderTabProvider),
     );
@@ -78,6 +83,7 @@ class _MyOrdersScreenState extends ConsumerState<MyOrdersScreen> {
                           borderRadius: BorderRadius.circular(10),
                           boxShadow: [
                             BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.06),
                               color: Colors.black.withOpacity(0.06),
                               blurRadius: 6,
                               offset: const Offset(0, 2),
@@ -105,6 +111,7 @@ class _MyOrdersScreenState extends ConsumerState<MyOrdersScreen> {
                   bottom: BorderSide(color: Color(0xFFE8DDD5), width: 1.2),
                 ),
               ),
+              child: OrderTabBar(activeIndex: activeTab, onTap: _onTabTap),
               child: OrderTabBar(
                 activeIndex: activeTab,
                 onTap: _onTabTap,
@@ -138,12 +145,17 @@ class _MyOrdersScreenState extends ConsumerState<MyOrdersScreen> {
                       }
                       return ListView.builder(
                         physics: const BouncingScrollPhysics(),
+                        padding: const EdgeInsets.only(top: 4, bottom: 24),
                         padding: const EdgeInsets.only(
                             top: 4, bottom: 24),
                         itemCount: orders.length,
                         itemBuilder: (_, i) => OrderCard(
                           order: orders[i],
                           onTap: () {
+                            context.push(
+                              AppRouter.orderDetail,
+                              extra: orders[i],
+                            );
                           },
                         ),
                       );
@@ -153,6 +165,17 @@ class _MyOrdersScreenState extends ConsumerState<MyOrdersScreen> {
                 loading: () => ListView.builder(
                   padding: const EdgeInsets.only(top: 4),
                   itemCount: 3,
+                  itemBuilder: (_, _) => const _ShimmerOrderCard(),
+                ),
+                error: (_, _) => Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.error_outline_rounded,
+                        size: 52,
+                        color: AppColors.textMedium.withValues(alpha: 0.35),
+                      ),
                   itemBuilder: (_, __) => const _ShimmerOrderCard(),
                 ),
                 error: (_, __) => Center(
@@ -166,6 +189,9 @@ class _MyOrdersScreenState extends ConsumerState<MyOrdersScreen> {
                       Text(
                         'Could not load orders',
                         style: GoogleFonts.lato(
+                          fontSize: 14,
+                          color: AppColors.textMedium,
+                        ),
                             fontSize: 14, color: AppColors.textMedium),
                       ),
                     ],
@@ -218,6 +244,7 @@ class _EmptyState extends StatelessWidget {
               width: 88,
               height: 88,
               decoration: BoxDecoration(
+                color: AppColors.primary.withValues(alpha: 0.1),
                 color: AppColors.primary.withOpacity(0.1),
                 shape: BoxShape.circle,
               ),
@@ -226,6 +253,7 @@ class _EmptyState extends StatelessWidget {
                     ? Icons.local_shipping_outlined
                     : Icons.shopping_bag_outlined,
                 size: 40,
+                color: AppColors.primary.withValues(alpha: 0.7),
                 color: AppColors.primary.withOpacity(0.7),
               ),
             ),
@@ -244,6 +272,9 @@ class _EmptyState extends StatelessWidget {
               _subtitle,
               textAlign: TextAlign.center,
               style: GoogleFonts.lato(
+                fontSize: 13,
+                color: AppColors.textMedium,
+              ),
                   fontSize: 13, color: AppColors.textMedium),
             ),
           ],
@@ -269,6 +300,13 @@ class _ShimmerOrderCardState extends State<_ShimmerOrderCard>
   void initState() {
     super.initState();
     _ctrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 900),
+    )..repeat(reverse: true);
+    _anim = Tween(
+      begin: 0.4,
+      end: 0.85,
+    ).animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeInOut));
         vsync: this, duration: const Duration(milliseconds: 900))
       ..repeat(reverse: true);
     _anim = Tween(begin: 0.4, end: 0.85).animate(
@@ -286,6 +324,11 @@ class _ShimmerOrderCardState extends State<_ShimmerOrderCard>
   Widget build(BuildContext context) {
     return AnimatedBuilder(
       animation: _anim,
+      builder: (_, _) => Container(
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 7),
+        height: 108,
+        decoration: BoxDecoration(
+          color: Colors.grey[300]!.withValues(alpha: _anim.value),
       builder: (_, __) => Container(
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 7),
         height: 108,
