@@ -19,6 +19,21 @@ import 'package:pustakalaya/features/splash/presentation/pages/splash_screen.dar
 class AppRouter {
   AppRouter._();
 
+  static const String splash         = '/';
+  static const String onboarding     = '/onboarding';
+  static const String signUp         = '/sign-up';
+  static const String signIn         = '/sign-in';
+  static const String home           = '/home';
+  static const String myOrders       = '/my-orders';
+  static const String orderDetail    = '/order-detail';
+  static const String bookDetail     = '/book-detail';
+  static const String cart           = '/cart';
+  static const String checkout       = '/checkout';
+  static const String confirmation   = '/confirmation';
+  static const String trackOrder     = '/track-order';
+  static const String notifications  = '/notifications';
+  static const String search         = '/search';
+  static const String filter         = '/filter';
   static const String splash = '/';
   static const String onboarding = '/onboarding';
   static const String signUp = '/sign-up';
@@ -34,6 +49,7 @@ class AppRouter {
   static const String notifications = '/notifications';
   static const String search = '/search';
   static const String filter = '/filter';
+  static const String bookDetail = '/book-detail';
 
   static final router = GoRouter(
     initialLocation: splash,
@@ -100,6 +116,17 @@ class AppRouter {
         },
       ),
       GoRoute(path: filter, builder: (_, _) => const FilterScreen()),
+      GoRoute(path: filter,
+          builder: (_, __) => const FilterScreen()),
+      GoRoute(path: notifications,
+          builder: (_, __) => const NotificationsScreen()),
+      GoRoute(path: splash, builder: (_, __) => const SplashScreen()),
+      GoRoute(path: onboarding, builder: (_, __) => const OnboardingScreen()),
+      GoRoute(path: signUp, builder: (_, __) => const SignUpScreen()),
+      GoRoute(path: signIn, builder: (_, __) => const SignInScreen()),
+      GoRoute(path: home, builder: (_, __) => const AppShell()),
+      GoRoute(path: myOrders, builder: (_, __) => const MyOrdersScreen()),
+      GoRoute(path: bookDetail, builder: (_, __) => const BookDetailScreen()),
     ],
   );
 }

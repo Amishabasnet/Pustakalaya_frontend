@@ -6,6 +6,9 @@ import 'core/services/local_notification_service.dart';
 import 'core/theme/app_theme.dart';
 
 void main() async {
+import 'core/theme/app_theme.dart';
+
+void main() {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
