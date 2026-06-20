@@ -4,10 +4,13 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pustakalaya/core/constants/app_colors.dart';
 import 'package:pustakalaya/core/router/app_router.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:pustakalaya/core/constants/app_colors.dart';
 import 'package:pustakalaya/features/orders/domain/entities/order_item.dart';
 import 'package:pustakalaya/features/orders/presentation/providers/orders_provider.dart';
 import 'package:pustakalaya/features/orders/presentation/widgets/order_card.dart';
 import 'package:pustakalaya/features/orders/presentation/widgets/order_tab_bar.dart';
+
 
 class MyOrdersScreen extends ConsumerStatefulWidget {
   const MyOrdersScreen({super.key});
@@ -23,6 +26,9 @@ class _MyOrdersScreenState extends ConsumerState<MyOrdersScreen> {
   void initState() {
     super.initState();
     _pageController = PageController(initialPage: ref.read(orderTabProvider));
+    _pageController = PageController(
+      initialPage: ref.read(orderTabProvider),
+    );
   }
 
   @override
@@ -78,6 +84,7 @@ class _MyOrdersScreenState extends ConsumerState<MyOrdersScreen> {
                           boxShadow: [
                             BoxShadow(
                               color: Colors.black.withValues(alpha: 0.06),
+                              color: Colors.black.withOpacity(0.06),
                               blurRadius: 6,
                               offset: const Offset(0, 2),
                             ),
@@ -105,6 +112,10 @@ class _MyOrdersScreenState extends ConsumerState<MyOrdersScreen> {
                 ),
               ),
               child: OrderTabBar(activeIndex: activeTab, onTap: _onTabTap),
+              child: OrderTabBar(
+                activeIndex: activeTab,
+                onTap: _onTabTap,
+              ),
             ),
 
             const SizedBox(height: 12),
@@ -135,6 +146,8 @@ class _MyOrdersScreenState extends ConsumerState<MyOrdersScreen> {
                       return ListView.builder(
                         physics: const BouncingScrollPhysics(),
                         padding: const EdgeInsets.only(top: 4, bottom: 24),
+                        padding: const EdgeInsets.only(
+                            top: 4, bottom: 24),
                         itemCount: orders.length,
                         itemBuilder: (_, i) => OrderCard(
                           order: orders[i],
@@ -163,6 +176,15 @@ class _MyOrdersScreenState extends ConsumerState<MyOrdersScreen> {
                         size: 52,
                         color: AppColors.textMedium.withValues(alpha: 0.35),
                       ),
+                  itemBuilder: (_, __) => const _ShimmerOrderCard(),
+                ),
+                error: (_, __) => Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.error_outline_rounded,
+                          size: 52,
+                          color: AppColors.textMedium.withOpacity(0.35)),
                       const SizedBox(height: 12),
                       Text(
                         'Could not load orders',
@@ -170,6 +192,7 @@ class _MyOrdersScreenState extends ConsumerState<MyOrdersScreen> {
                           fontSize: 14,
                           color: AppColors.textMedium,
                         ),
+                            fontSize: 14, color: AppColors.textMedium),
                       ),
                     ],
                   ),
@@ -222,6 +245,7 @@ class _EmptyState extends StatelessWidget {
               height: 88,
               decoration: BoxDecoration(
                 color: AppColors.primary.withValues(alpha: 0.1),
+                color: AppColors.primary.withOpacity(0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(
@@ -230,6 +254,7 @@ class _EmptyState extends StatelessWidget {
                     : Icons.shopping_bag_outlined,
                 size: 40,
                 color: AppColors.primary.withValues(alpha: 0.7),
+                color: AppColors.primary.withOpacity(0.7),
               ),
             ),
             const SizedBox(height: 20),
@@ -250,6 +275,7 @@ class _EmptyState extends StatelessWidget {
                 fontSize: 13,
                 color: AppColors.textMedium,
               ),
+                  fontSize: 13, color: AppColors.textMedium),
             ),
           ],
         ),
@@ -281,6 +307,11 @@ class _ShimmerOrderCardState extends State<_ShimmerOrderCard>
       begin: 0.4,
       end: 0.85,
     ).animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeInOut));
+        vsync: this, duration: const Duration(milliseconds: 900))
+      ..repeat(reverse: true);
+    _anim = Tween(begin: 0.4, end: 0.85).animate(
+      CurvedAnimation(parent: _ctrl, curve: Curves.easeInOut),
+    );
   }
 
   @override
@@ -298,6 +329,11 @@ class _ShimmerOrderCardState extends State<_ShimmerOrderCard>
         height: 108,
         decoration: BoxDecoration(
           color: Colors.grey[300]!.withValues(alpha: _anim.value),
+      builder: (_, __) => Container(
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 7),
+        height: 108,
+        decoration: BoxDecoration(
+          color: Colors.grey[300]!.withOpacity(_anim.value),
           borderRadius: BorderRadius.circular(14),
         ),
       ),

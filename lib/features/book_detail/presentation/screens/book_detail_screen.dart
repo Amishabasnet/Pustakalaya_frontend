@@ -108,6 +108,7 @@ class BookDetailScreen extends ConsumerWidget {
                                       fontWeight: FontWeight.w600,
                                       color:
                                           textOnCover.withValues(alpha: 0.75),
+                                          textOnCover.withOpacity(0.75),
                                       letterSpacing: 2.5,
                                     ),
                                   ),
@@ -219,6 +220,7 @@ class BookDetailScreen extends ConsumerWidget {
                               decoration: BoxDecoration(
                                 color: isWishlisted
                                     ? AppColors.primary.withValues(alpha: 0.1)
+                                    ? AppColors.primary.withOpacity(0.1)
                                     : Colors.transparent,
                                 shape: BoxShape.circle,
                               ),
@@ -248,6 +250,7 @@ class BookDetailScreen extends ConsumerWidget {
                               iconColor: const Color(0xFF27AE60),
                               borderColor:
                                   const Color(0xFF27AE60).withValues(alpha: 0.4),
+                                  const Color(0xFF27AE60).withOpacity(0.4),
                               textColor: const Color(0xFF27AE60),
                             ),
                           _BadgeChip(
@@ -256,6 +259,7 @@ class BookDetailScreen extends ConsumerWidget {
                             iconColor: const Color(0xFFE8A020),
                             borderColor:
                                 const Color(0xFFE8A020).withValues(alpha: 0.4),
+                                const Color(0xFFE8A020).withOpacity(0.4),
                             textColor: AppColors.textDark,
                           ),
                           if (detail.inStock)
@@ -263,6 +267,7 @@ class BookDetailScreen extends ConsumerWidget {
                               label: 'In Stock',
                               borderColor:
                                   const Color(0xFF2E86AB).withValues(alpha: 0.4),
+                                  const Color(0xFF2E86AB).withOpacity(0.4),
                               textColor: const Color(0xFF2E86AB),
                             ),
                         ],
@@ -388,6 +393,7 @@ class BookDetailScreen extends ConsumerWidget {
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withValues(alpha: 0.08),
+                    color: Colors.black.withOpacity(0.08),
                     blurRadius: 16,
                     offset: const Offset(0, -4),
                   ),
@@ -473,6 +479,7 @@ class _AppBarBtn extends StatelessWidget {
         height: 36,
         decoration: BoxDecoration(
           color: Colors.white.withValues(alpha: 0.25),
+          color: Colors.white.withOpacity(0.25),
           borderRadius: BorderRadius.circular(10),
         ),
         child: Icon(
@@ -543,6 +550,7 @@ class _DecorCircle extends StatelessWidget {
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         color: Colors.white.withValues(alpha: opacity),
+        color: Colors.white.withOpacity(opacity),
       ),
     );
   }

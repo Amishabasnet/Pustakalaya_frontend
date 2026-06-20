@@ -36,6 +36,7 @@ class OrderCard extends StatelessWidget {
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.06),
+              color: Colors.black.withOpacity(0.06),
               blurRadius: 12,
               offset: const Offset(0, 3),
             ),
@@ -66,6 +67,7 @@ class OrderCard extends StatelessWidget {
                   children: [
                     // Spine
                     Container(width: 6, color: Colors.black.withValues(alpha: 0.18)),
+                    Container(width: 6, color: Colors.black.withOpacity(0.18)),
                     // Decorative circle
                     Positioned(
                       top: -14,
@@ -76,6 +78,7 @@ class OrderCard extends StatelessWidget {
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           color: Colors.white.withValues(alpha: 0.08),
+                          color: Colors.white.withOpacity(0.08),
                         ),
                       ),
                     ),
@@ -102,6 +105,7 @@ class OrderCard extends StatelessWidget {
                             style: GoogleFonts.lato(
                               fontSize: 6.5,
                               color: textOnCover.withValues(alpha: 0.75),
+                              color: textOnCover.withOpacity(0.75),
                               fontWeight: FontWeight.w500,
                             ),
                             maxLines: 1,

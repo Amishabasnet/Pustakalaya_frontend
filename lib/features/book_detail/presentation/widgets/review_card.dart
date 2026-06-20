@@ -59,6 +59,7 @@ class ReviewCard extends StatelessWidget {
                       color: i < review.starRating
                           ? const Color(0xFFE8A020)
                           : AppColors.primary.withValues(alpha: 0.35),
+                          : AppColors.primary.withOpacity(0.35),
                     );
                   }),
                 ),
