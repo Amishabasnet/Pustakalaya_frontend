@@ -43,13 +43,13 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       await notifier.nextPage();
     } else {
       await notifier.nextPage();
-      if (mounted) context.go(AppRouter.home);
+      if (mounted) context.go(AppRouter.signIn);
     }
   }
 
   Future<void> _onSkip() async {
     await ref.read(onboardingNotifierProvider.notifier).skipOnboarding();
-    if (mounted) context.go(AppRouter.home);
+    if (mounted) context.go(AppRouter.signIn);
   }
 
   @override

@@ -195,7 +195,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                             fontWeight: FontWeight.w700,
                           ),
                           recognizer: TapGestureRecognizer()
-                            ..onTap = () => context.go(AppRouter.signIn),
+                            ..onTap = () => context.go(AppRouter.signUp),
                         ),
                       ],
                     ),

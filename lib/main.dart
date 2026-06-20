@@ -5,10 +5,7 @@ import 'core/router/app_router.dart';
 import 'core/services/local_notification_service.dart';
 import 'core/theme/app_theme.dart';
 
-void main() async {
-import 'core/theme/app_theme.dart';
-
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(

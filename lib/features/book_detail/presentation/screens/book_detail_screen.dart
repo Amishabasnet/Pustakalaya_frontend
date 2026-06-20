@@ -9,7 +9,6 @@ import 'package:pustakalaya/features/book_detail/presentation/widgets/review_car
 import 'package:pustakalaya/features/cart/presentation/providers/cart_provider.dart';
 import 'package:pustakalaya/features/wishlist/presentation/providers/wishlist_provider.dart';
 
-
 class BookDetailScreen extends ConsumerWidget {
   const BookDetailScreen({super.key});
 
@@ -22,7 +21,9 @@ class BookDetailScreen extends ConsumerWidget {
 
     if (detail == null) {
       return const Scaffold(
-        body: Center(child: CircularProgressIndicator(color: AppColors.primary)),
+        body: Center(
+          child: CircularProgressIndicator(color: AppColors.primary),
+        ),
       );
     }
 
@@ -69,21 +70,24 @@ class BookDetailScreen extends ConsumerWidget {
                             top: -40,
                             left: -40,
                             child: _DecorCircle(
-                                size: 160,
-                                opacity: isDark ? 0.08 : 0.12),
+                              size: 160,
+                              opacity: isDark ? 0.08 : 0.12,
+                            ),
                           ),
                           Positioned(
                             bottom: -30,
                             right: -30,
                             child: _DecorCircle(
-                                size: 140,
-                                opacity: isDark ? 0.06 : 0.10),
+                              size: 140,
+                              opacity: isDark ? 0.06 : 0.10,
+                            ),
                           ),
                           // Book title on cover
                           Center(
                             child: Padding(
                               padding: EdgeInsets.symmetric(
-                                  horizontal: hPad + 20),
+                                horizontal: hPad + 20,
+                              ),
                               child: Column(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
@@ -91,8 +95,7 @@ class BookDetailScreen extends ConsumerWidget {
                                     book.title.toUpperCase(),
                                     textAlign: TextAlign.center,
                                     style: GoogleFonts.playfairDisplay(
-                                      fontSize:
-                                          screenW > 600 ? 42 : 34,
+                                      fontSize: screenW > 600 ? 42 : 34,
                                       fontWeight: FontWeight.w900,
                                       color: textOnCover,
                                       height: 1.1,
@@ -106,9 +109,9 @@ class BookDetailScreen extends ConsumerWidget {
                                     style: GoogleFonts.lato(
                                       fontSize: 11,
                                       fontWeight: FontWeight.w600,
-                                      color:
-                                          textOnCover.withValues(alpha: 0.75),
-                                          textOnCover.withOpacity(0.75),
+                                      color: textOnCover.withValues(
+                                        alpha: 0.75,
+                                      ),
                                       letterSpacing: 2.5,
                                     ),
                                   ),
@@ -124,10 +127,11 @@ class BookDetailScreen extends ConsumerWidget {
                     SafeArea(
                       child: Padding(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 4),
+                          horizontal: 12,
+                          vertical: 4,
+                        ),
                         child: Row(
-                          mainAxisAlignment:
-                              MainAxisAlignment.spaceBetween,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             _AppBarBtn(
                               icon: Icons.arrow_back_ios_new_rounded,
@@ -163,9 +167,8 @@ class BookDetailScreen extends ConsumerWidget {
                         },
                         onDecrement: () {
                           if (quantity > 1) {
-                            ref
-                                .read(bookQuantityProvider.notifier)
-                                .state = quantity - 1;
+                            ref.read(bookQuantityProvider.notifier).state =
+                                quantity - 1;
                           }
                         },
                       ),
@@ -186,8 +189,7 @@ class BookDetailScreen extends ConsumerWidget {
                         children: [
                           Expanded(
                             child: Column(
-                              crossAxisAlignment:
-                                  CrossAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
                                   book.title,
@@ -220,7 +222,6 @@ class BookDetailScreen extends ConsumerWidget {
                               decoration: BoxDecoration(
                                 color: isWishlisted
                                     ? AppColors.primary.withValues(alpha: 0.1)
-                                    ? AppColors.primary.withOpacity(0.1)
                                     : Colors.transparent,
                                 shape: BoxShape.circle,
                               ),
@@ -248,26 +249,26 @@ class BookDetailScreen extends ConsumerWidget {
                               icon: Icons.verified_rounded,
                               label: 'Verified Seller',
                               iconColor: const Color(0xFF27AE60),
-                              borderColor:
-                                  const Color(0xFF27AE60).withValues(alpha: 0.4),
-                                  const Color(0xFF27AE60).withOpacity(0.4),
+                              borderColor: const Color(
+                                0xFF27AE60,
+                              ).withValues(alpha: 0.4),
                               textColor: const Color(0xFF27AE60),
                             ),
                           _BadgeChip(
                             icon: Icons.star_rounded,
                             label: '${book.rating} rating',
                             iconColor: const Color(0xFFE8A020),
-                            borderColor:
-                                const Color(0xFFE8A020).withValues(alpha: 0.4),
-                                const Color(0xFFE8A020).withOpacity(0.4),
+                            borderColor: const Color(
+                              0xFFE8A020,
+                            ).withValues(alpha: 0.4),
                             textColor: AppColors.textDark,
                           ),
                           if (detail.inStock)
                             _BadgeChip(
                               label: 'In Stock',
-                              borderColor:
-                                  const Color(0xFF2E86AB).withValues(alpha: 0.4),
-                                  const Color(0xFF2E86AB).withOpacity(0.4),
+                              borderColor: const Color(
+                                0xFF2E86AB,
+                              ).withValues(alpha: 0.4),
                               textColor: const Color(0xFF2E86AB),
                             ),
                         ],
@@ -296,7 +297,9 @@ class BookDetailScreen extends ConsumerWidget {
                           const SizedBox(width: 8),
                           Container(
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 7, vertical: 2),
+                              horizontal: 7,
+                              vertical: 2,
+                            ),
                             decoration: BoxDecoration(
                               color: const Color(0xFFD4EDDA),
                               borderRadius: BorderRadius.circular(4),
@@ -331,9 +334,10 @@ class BookDetailScreen extends ConsumerWidget {
                 child: AccordionSection(
                   title: 'Preview & description',
                   isExpanded: accordion[0] ?? true,
-                  onToggle: () => ref
-                      .read(accordionProvider.notifier)
-                      .state = {...accordion, 0: !(accordion[0] ?? true)},
+                  onToggle: () => ref.read(accordionProvider.notifier).state = {
+                    ...accordion,
+                    0: !(accordion[0] ?? true),
+                  },
                   child: Text(
                     detail.description,
                     style: GoogleFonts.lato(
@@ -349,9 +353,10 @@ class BookDetailScreen extends ConsumerWidget {
                 child: AccordionSection(
                   title: 'Return guarantee',
                   isExpanded: accordion[1] ?? false,
-                  onToggle: () => ref
-                      .read(accordionProvider.notifier)
-                      .state = {...accordion, 1: !(accordion[1] ?? false)},
+                  onToggle: () => ref.read(accordionProvider.notifier).state = {
+                    ...accordion,
+                    1: !(accordion[1] ?? false),
+                  },
                   child: Text(
                     detail.returnPolicy,
                     style: GoogleFonts.lato(
@@ -367,9 +372,10 @@ class BookDetailScreen extends ConsumerWidget {
                 child: AccordionSection(
                   title: 'Reviews (${detail.reviews.length * 64})',
                   isExpanded: accordion[2] ?? true,
-                  onToggle: () => ref
-                      .read(accordionProvider.notifier)
-                      .state = {...accordion, 2: !(accordion[2] ?? true)},
+                  onToggle: () => ref.read(accordionProvider.notifier).state = {
+                    ...accordion,
+                    2: !(accordion[2] ?? true),
+                  },
                   child: Column(
                     children: detail.reviews
                         .map((r) => ReviewCard(review: r))
@@ -393,7 +399,6 @@ class BookDetailScreen extends ConsumerWidget {
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withValues(alpha: 0.08),
-                    color: Colors.black.withOpacity(0.08),
                     blurRadius: 16,
                     offset: const Offset(0, -4),
                   ),
@@ -422,7 +427,8 @@ class BookDetailScreen extends ConsumerWidget {
                             backgroundColor: AppColors.primary,
                             behavior: SnackBarBehavior.floating,
                             shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10)),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
                             duration: const Duration(seconds: 2),
                           ),
                         );
@@ -430,7 +436,8 @@ class BookDetailScreen extends ConsumerWidget {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primary,
                         shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12)),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                         elevation: 0,
                       ),
                       child: Text(
@@ -464,11 +471,7 @@ class _AppBarBtn extends StatelessWidget {
   final VoidCallback onTap;
   final Color? iconColor;
 
-  const _AppBarBtn({
-    required this.icon,
-    required this.onTap,
-    this.iconColor,
-  });
+  const _AppBarBtn({required this.icon, required this.onTap, this.iconColor});
 
   @override
   Widget build(BuildContext context) {
@@ -479,18 +482,14 @@ class _AppBarBtn extends StatelessWidget {
         height: 36,
         decoration: BoxDecoration(
           color: Colors.white.withValues(alpha: 0.25),
-          color: Colors.white.withOpacity(0.25),
           borderRadius: BorderRadius.circular(10),
         ),
-        child: Icon(
-          icon,
-          size: 18,
-          color: iconColor ?? Colors.white,
-        ),
+        child: Icon(icon, size: 18, color: iconColor ?? Colors.white),
       ),
     );
   }
 }
+
 class _BadgeChip extends StatelessWidget {
   final IconData? icon;
   final String label;
@@ -550,7 +549,6 @@ class _DecorCircle extends StatelessWidget {
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         color: Colors.white.withValues(alpha: opacity),
-        color: Colors.white.withOpacity(opacity),
       ),
     );
   }
