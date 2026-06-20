@@ -14,7 +14,7 @@ class AppShell extends ConsumerWidget {
   static const _screens = [
     HomeScreen(),
     WishlistScreen(),
-    CartScreen(),
+    CartScreen(showBackButton: false),
     ProfileScreen(),
   ];
 
@@ -23,10 +23,7 @@ class AppShell extends ConsumerWidget {
     final activeTab = ref.watch(activeTabProvider);
 
     return Scaffold(
-      body: IndexedStack(
-        index: activeTab,
-        children: _screens,
-      ),
+      body: IndexedStack(index: activeTab, children: _screens),
       bottomNavigationBar: PustakalayaNavBar(
         currentIndex: activeTab,
         onTap: (i) => ref.read(activeTabProvider.notifier).state = i,

@@ -15,8 +15,9 @@ class NotificationTile extends ConsumerWidget {
     final diff = DateTime.now().difference(timestamp);
     if (diff.inMinutes < 1) return 'Just now';
     if (diff.inMinutes < 60) return '${diff.inMinutes} mins ago';
-    if (diff.inHours < 24)
+    if (diff.inHours < 24) {
       return '${diff.inHours} hour${diff.inHours > 1 ? 's' : ''} ago';
+    }
     // Yesterday or earlier
     final hour = timestamp.hour;
     final minute = timestamp.minute.toString().padLeft(2, '0');
@@ -57,17 +58,17 @@ class NotificationTile extends ConsumerWidget {
           margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            color: isUnread ? Colors.white : Colors.white.withOpacity(0.75),
+            color: isUnread ? Colors.white : Colors.white.withValues(alpha: 0.75),
             borderRadius: BorderRadius.circular(14),
             border: isUnread
                 ? Border.all(
-                    color: AppColors.primary.withOpacity(0.2),
+                    color: AppColors.primary.withValues(alpha: 0.2),
                     width: 1,
                   )
                 : null,
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(isUnread ? 0.06 : 0.03),
+                color: Colors.black.withValues(alpha: isUnread ? 0.06 : 0.03),
                 blurRadius: isUnread ? 10 : 5,
                 offset: const Offset(0, 2),
               ),
@@ -80,7 +81,7 @@ class NotificationTile extends ConsumerWidget {
                 width: 44,
                 height: 44,
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withOpacity(0.08),
+                  color: AppColors.primary.withValues(alpha: 0.08),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Center(

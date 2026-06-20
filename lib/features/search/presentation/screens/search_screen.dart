@@ -5,6 +5,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:pustakalaya/core/constants/app_colors.dart';
 import 'package:pustakalaya/core/router/app_router.dart';
 import 'package:pustakalaya/features/book_detail/presentation/providers/book_detail_provider.dart';
+import 'package:pustakalaya/features/filter/domain/entities/filter_state.dart';
+import 'package:pustakalaya/features/filter/presentation/providers/filter_provider.dart';
 import 'package:pustakalaya/features/home/presentation/providers/home_provider.dart';
 import 'package:pustakalaya/features/search/presentation/providers/search_provider.dart';
 import 'package:pustakalaya/features/search/presentation/widgets/recent_search_chip.dart';
@@ -69,7 +71,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     final sectionFilter = ref.watch(sectionFilterProvider);
     final recentSearches = ref.watch(recentSearchesProvider);
     final results = ref.watch(searchResultsProvider);
-    final recommendedAsync = ref.watch(highlyRecommendedProvider);
+    final recommendedAsync = ref.watch(filteredBrowseProvider);
+    final activeFilters = ref.watch(filterProvider);
     final screenW = MediaQuery.of(context).size.width;
     final hPad = screenW > 600 ? 32.0 : 16.0;
     final isSearching = query.trim().isNotEmpty;
@@ -283,11 +286,14 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                       recentSearches: recentSearches,
                       recommendedAsync: recommendedAsync,
                       hPad: hPad,
+                      activeFilters: activeFilters,
                       onChipTap: _onSearch,
                       onRemoveChip: (s) =>
                           ref.read(recentSearchesProvider.notifier).remove(s),
                       onClearAll: () =>
                           ref.read(recentSearchesProvider.notifier).clearAll(),
+                      onClearFilters: () =>
+                          ref.read(filterProvider.notifier).resetAll(),
                       onBookTap: _navigateToBook,
                     ),
             ),
@@ -354,18 +360,22 @@ class _DefaultView extends StatelessWidget {
   final List<String> recentSearches;
   final AsyncValue recommendedAsync;
   final double hPad;
+  final FilterState activeFilters;
   final ValueChanged<String> onChipTap;
   final ValueChanged<String> onRemoveChip;
   final VoidCallback onClearAll;
+  final VoidCallback onClearFilters;
   final Function(dynamic) onBookTap;
 
   const _DefaultView({
     required this.recentSearches,
     required this.recommendedAsync,
     required this.hPad,
+    required this.activeFilters,
     required this.onChipTap,
     required this.onRemoveChip,
     required this.onClearAll,
+    required this.onClearFilters,
     required this.onBookTap,
   });
 
@@ -422,7 +432,9 @@ class _DefaultView extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              'HIGHLY RECOMMENDED',
+              activeFilters.hasActiveFilters
+                  ? 'FILTERED RESULTS'
+                  : 'HIGHLY RECOMMENDED',
               style: GoogleFonts.lato(
                 fontSize: 11,
                 fontWeight: FontWeight.w700,
@@ -430,6 +442,18 @@ class _DefaultView extends StatelessWidget {
                 letterSpacing: 0.8,
               ),
             ),
+            if (activeFilters.hasActiveFilters)
+              GestureDetector(
+                onTap: onClearFilters,
+                child: Text(
+                  'Clear filters',
+                  style: GoogleFonts.lato(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.primary,
+                  ),
+                ),
+              ),
           ],
         ),
         const SizedBox(height: 12),

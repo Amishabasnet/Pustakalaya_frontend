@@ -55,7 +55,7 @@ class RecommendedBookCard extends ConsumerWidget {
               child: Stack(
                 children: [
                   // Spine
-                  Container(width: 8, color: Colors.black.withOpacity(0.18)),
+                  Container(width: 8, color: Colors.black.withValues(alpha: 0.18)),
                   // Decor circles
                   Positioned(
                     top: -24,
@@ -65,7 +65,7 @@ class RecommendedBookCard extends ConsumerWidget {
                       height: 90,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: Colors.white.withOpacity(0.08),
+                        color: Colors.white.withValues(alpha: 0.08),
                       ),
                     ),
                   ),
@@ -77,7 +77,7 @@ class RecommendedBookCard extends ConsumerWidget {
                       height: 70,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: Colors.white.withOpacity(0.06),
+                        color: Colors.white.withValues(alpha: 0.06),
                       ),
                     ),
                   ),
@@ -103,14 +103,14 @@ class RecommendedBookCard extends ConsumerWidget {
                         Container(
                           height: 1.5,
                           width: 28,
-                          color: textOnCover.withOpacity(0.4),
+                          color: textOnCover.withValues(alpha: 0.4),
                         ),
                         const SizedBox(height: 8),
                         Text(
                           book.author,
                           style: GoogleFonts.lato(
                             fontSize: 10,
-                            color: textOnCover.withOpacity(0.8),
+                            color: textOnCover.withValues(alpha: 0.8),
                             fontWeight: FontWeight.w600,
                             letterSpacing: 0.3,
                           ),

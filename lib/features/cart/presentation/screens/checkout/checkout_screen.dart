@@ -210,7 +210,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
-                  color: Colors.black.withOpacity(0.12),
+                  color: Colors.black.withValues(alpha: 0.12),
                   blurRadius: 24,
                   offset: const Offset(0, 8))
             ],
@@ -224,7 +224,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                 width: 64,
                 height: 64,
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withOpacity(0.1),
+                  color: AppColors.primary.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(Icons.shopping_bag_outlined,
@@ -434,7 +434,7 @@ class _BackBtn extends StatelessWidget {
         width: 36,
         height: 36,
         decoration: BoxDecoration(
-          color: AppColors.primary.withOpacity(0.1),
+          color: AppColors.primary.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(10),
         ),
         child: const Icon(Icons.arrow_back_ios_new_rounded,
@@ -458,7 +458,7 @@ class _AddressField extends StatelessWidget {
         borderRadius: BorderRadius.circular(14),
         boxShadow: [
           BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 10,
               offset: const Offset(0, 2))
         ],
@@ -513,7 +513,7 @@ class _DeliveryCard extends ConsumerWidget {
         borderRadius: BorderRadius.circular(14),
         boxShadow: [
           BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 10,
               offset: const Offset(0, 2))
         ],
@@ -573,12 +573,12 @@ class _DeliveryTile extends StatelessWidget {
             const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         decoration: BoxDecoration(
           color: isSelected
-              ? AppColors.primary.withOpacity(0.06)
+              ? AppColors.primary.withValues(alpha: 0.06)
               : const Color(0xFFF9F5F2),
           borderRadius: BorderRadius.circular(10),
           border: Border.all(
             color: isSelected
-                ? AppColors.primary.withOpacity(0.6)
+                ? AppColors.primary.withValues(alpha: 0.6)
                 : const Color(0xFFEEE8E0),
             width: isSelected ? 1.5 : 1,
           ),
@@ -665,7 +665,7 @@ class _PaymentCard extends ConsumerWidget {
         borderRadius: BorderRadius.circular(14),
         boxShadow: [
           BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 10,
               offset: const Offset(0, 2))
         ],
@@ -696,12 +696,12 @@ class _PaymentCard extends ConsumerWidget {
                   duration: const Duration(milliseconds: 180),
                   decoration: BoxDecoration(
                     color: isSel
-                        ? AppColors.primary.withOpacity(0.06)
+                        ? AppColors.primary.withValues(alpha: 0.06)
                         : const Color(0xFFF9F5F2),
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(
                       color: isSel
-                          ? AppColors.primary.withOpacity(0.6)
+                          ? AppColors.primary.withValues(alpha: 0.6)
                           : const Color(0xFFEEE8E0),
                       width: isSel ? 1.5 : 1,
                     ),
@@ -768,7 +768,7 @@ class _OrderSummaryCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(14),
         boxShadow: [
           BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 10,
               offset: const Offset(0, 2))
         ],
@@ -850,7 +850,7 @@ class _SecurityBanner extends StatelessWidget {
         color: const Color(0xFFEAF7EE),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-            color: const Color(0xFF27AE60).withOpacity(0.3)),
+            color: const Color(0xFF27AE60).withValues(alpha: 0.3)),
       ),
       child: Row(
         children: [

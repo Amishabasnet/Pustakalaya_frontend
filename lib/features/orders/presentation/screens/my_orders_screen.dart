@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pustakalaya/core/constants/app_colors.dart';
+import 'package:pustakalaya/core/router/app_router.dart';
 import 'package:pustakalaya/features/orders/domain/entities/order_item.dart';
 import 'package:pustakalaya/features/orders/presentation/providers/orders_provider.dart';
 import 'package:pustakalaya/features/orders/presentation/widgets/order_card.dart';
 import 'package:pustakalaya/features/orders/presentation/widgets/order_tab_bar.dart';
-
 
 class MyOrdersScreen extends ConsumerStatefulWidget {
   const MyOrdersScreen({super.key});
@@ -21,9 +22,7 @@ class _MyOrdersScreenState extends ConsumerState<MyOrdersScreen> {
   @override
   void initState() {
     super.initState();
-    _pageController = PageController(
-      initialPage: ref.read(orderTabProvider),
-    );
+    _pageController = PageController(initialPage: ref.read(orderTabProvider));
   }
 
   @override
@@ -105,10 +104,7 @@ class _MyOrdersScreenState extends ConsumerState<MyOrdersScreen> {
                   bottom: BorderSide(color: Color(0xFFE8DDD5), width: 1.2),
                 ),
               ),
-              child: OrderTabBar(
-                activeIndex: activeTab,
-                onTap: _onTabTap,
-              ),
+              child: OrderTabBar(activeIndex: activeTab, onTap: _onTabTap),
             ),
 
             const SizedBox(height: 12),
@@ -138,12 +134,15 @@ class _MyOrdersScreenState extends ConsumerState<MyOrdersScreen> {
                       }
                       return ListView.builder(
                         physics: const BouncingScrollPhysics(),
-                        padding: const EdgeInsets.only(
-                            top: 4, bottom: 24),
+                        padding: const EdgeInsets.only(top: 4, bottom: 24),
                         itemCount: orders.length,
                         itemBuilder: (_, i) => OrderCard(
                           order: orders[i],
                           onTap: () {
+                            context.push(
+                              AppRouter.orderDetail,
+                              extra: orders[i],
+                            );
                           },
                         ),
                       );
@@ -159,14 +158,18 @@ class _MyOrdersScreenState extends ConsumerState<MyOrdersScreen> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(Icons.error_outline_rounded,
-                          size: 52,
-                          color: AppColors.textMedium.withValues(alpha: 0.35)),
+                      Icon(
+                        Icons.error_outline_rounded,
+                        size: 52,
+                        color: AppColors.textMedium.withValues(alpha: 0.35),
+                      ),
                       const SizedBox(height: 12),
                       Text(
                         'Could not load orders',
                         style: GoogleFonts.lato(
-                            fontSize: 14, color: AppColors.textMedium),
+                          fontSize: 14,
+                          color: AppColors.textMedium,
+                        ),
                       ),
                     ],
                   ),
@@ -244,7 +247,9 @@ class _EmptyState extends StatelessWidget {
               _subtitle,
               textAlign: TextAlign.center,
               style: GoogleFonts.lato(
-                  fontSize: 13, color: AppColors.textMedium),
+                fontSize: 13,
+                color: AppColors.textMedium,
+              ),
             ),
           ],
         ),
@@ -269,11 +274,13 @@ class _ShimmerOrderCardState extends State<_ShimmerOrderCard>
   void initState() {
     super.initState();
     _ctrl = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 900))
-      ..repeat(reverse: true);
-    _anim = Tween(begin: 0.4, end: 0.85).animate(
-      CurvedAnimation(parent: _ctrl, curve: Curves.easeInOut),
-    );
+      vsync: this,
+      duration: const Duration(milliseconds: 900),
+    )..repeat(reverse: true);
+    _anim = Tween(
+      begin: 0.4,
+      end: 0.85,
+    ).animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeInOut));
   }
 
   @override

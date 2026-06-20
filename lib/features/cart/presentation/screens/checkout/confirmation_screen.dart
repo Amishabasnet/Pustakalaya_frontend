@@ -170,7 +170,7 @@ class ConfirmationScreen extends StatelessWidget {
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
-                  color: Colors.black.withOpacity(0.12),
+                  color: Colors.black.withValues(alpha: 0.12),
                   blurRadius: 24,
                   offset: const Offset(0, 8))
             ],
@@ -183,7 +183,7 @@ class ConfirmationScreen extends StatelessWidget {
                 width: 64,
                 height: 64,
                 decoration: BoxDecoration(
-                  color: Colors.red.withOpacity(0.1),
+                  color: Colors.red.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(Icons.cancel_outlined,
@@ -316,7 +316,7 @@ class _AnimatedCheckmarkState extends State<_AnimatedCheckmark>
             shape: BoxShape.circle,
             boxShadow: [
               BoxShadow(
-                color: const Color(0xFF27AE60).withOpacity(0.18),
+                color: const Color(0xFF27AE60).withValues(alpha: 0.18),
                 blurRadius: 24,
                 spreadRadius: 4,
               ),
@@ -352,7 +352,7 @@ class _OrderDetailsCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 12,
             offset: const Offset(0, 2),
           ),
@@ -451,7 +451,7 @@ class _BackBtn extends StatelessWidget {
         width: 36,
         height: 36,
         decoration: BoxDecoration(
-          color: AppColors.primary.withOpacity(0.1),
+          color: AppColors.primary.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(10),
         ),
         child: const Icon(Icons.arrow_back_ios_new_rounded,

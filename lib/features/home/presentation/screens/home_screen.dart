@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pustakalaya/core/constants/app_colors.dart';
+import 'package:pustakalaya/core/router/app_router.dart';
 import 'package:pustakalaya/features/home/presentation/providers/home_provider.dart';
 import 'package:pustakalaya/features/home/presentation/widgets/featured_book_card.dart';
 import 'package:pustakalaya/features/home/presentation/widgets/recently_added_tile.dart';
+import 'package:pustakalaya/features/notifications/presentation/providers/notifications_provider.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -49,31 +52,36 @@ class HomeScreen extends ConsumerWidget {
             actions: [
               Padding(
                 padding: const EdgeInsets.only(right: 16),
-                child: Stack(
-                  children: [
-                    IconButton(
-                      icon: const Icon(
-                        Icons.notifications_outlined,
-                        color: AppColors.textDark,
-                        size: 24,
-                      ),
-                      onPressed: () => ref,
-                      // .read(activeTabProvider.notifier)
-                      // .state = 2,
-                    ),
-                    Positioned(
-                      right: 8,
-                      top: 8,
-                      child: Container(
-                        width: 8,
-                        height: 8,
-                        decoration: const BoxDecoration(
-                          color: AppColors.primary,
-                          shape: BoxShape.circle,
+                child: Consumer(
+                  builder: (context, ref, _) {
+                    final unreadCount = ref.watch(unreadCountProvider);
+                    return Stack(
+                      children: [
+                        IconButton(
+                          icon: const Icon(
+                            Icons.notifications_outlined,
+                            color: AppColors.textDark,
+                            size: 24,
+                          ),
+                          onPressed: () =>
+                              context.push(AppRouter.notifications),
                         ),
-                      ),
-                    ),
-                  ],
+                        if (unreadCount > 0)
+                          Positioned(
+                            right: 8,
+                            top: 8,
+                            child: Container(
+                              width: 8,
+                              height: 8,
+                              decoration: const BoxDecoration(
+                                color: AppColors.primary,
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                          ),
+                      ],
+                    );
+                  },
                 ),
               ),
             ],
@@ -125,52 +133,62 @@ class HomeScreen extends ConsumerWidget {
                   child: Row(
                     children: [
                       Expanded(
-                        child: Container(
-                          height: 48,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(12),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.06),
-                                blurRadius: 8,
-                                offset: const Offset(0, 2),
-                              ),
-                            ],
-                          ),
-                          child: Row(
-                            children: [
-                              const SizedBox(width: 14),
-                              Icon(
-                                Icons.search_rounded,
-                                color: AppColors.textMedium.withValues(alpha: 0.55),
-                                size: 20,
-                              ),
-                              const SizedBox(width: 8),
-                              Text(
-                                'Search books',
-                                style: GoogleFonts.lato(
-                                  fontSize: 14,
-                                  color: AppColors.textMedium.withValues(alpha: 0.55),
+                        child: GestureDetector(
+                          onTap: () => context.push(AppRouter.search),
+                          child: Container(
+                            height: 48,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.06),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 2),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
+                            child: Row(
+                              children: [
+                                const SizedBox(width: 14),
+                                Icon(
+                                  Icons.search_rounded,
+                                  color: AppColors.textMedium.withValues(
+                                    alpha: 0.55,
+                                  ),
+                                  size: 20,
+                                ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  'Search books',
+                                  style: GoogleFonts.lato(
+                                    fontSize: 14,
+                                    color: AppColors.textMedium.withValues(
+                                      alpha: 0.55,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
                       const SizedBox(width: 10),
-                      // Filter button
-                      Container(
-                        width: 48,
-                        height: 48,
-                        decoration: BoxDecoration(
-                          color: AppColors.primary,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: const Icon(
-                          Icons.tune_rounded,
-                          color: Colors.white,
-                          size: 20,
+                      // Filter button — opens Search then Filter
+                      GestureDetector(
+                        onTap: () => context.push(AppRouter.filter),
+                        child: Container(
+                          width: 48,
+                          height: 48,
+                          decoration: BoxDecoration(
+                            color: AppColors.primary,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: const Icon(
+                            Icons.tune_rounded,
+                            color: Colors.white,
+                            size: 20,
+                          ),
                         ),
                       ),
                     ],
@@ -198,7 +216,10 @@ class HomeScreen extends ConsumerWidget {
                         ),
                       ),
                       GestureDetector(
-                        onTap: () {},
+                        onTap: () => context.push(
+                          AppRouter.search,
+                          extra: {'section': 'featured'},
+                        ),
                         child: Text(
                           'See all',
                           style: GoogleFonts.lato(
@@ -246,7 +267,6 @@ class HomeScreen extends ConsumerWidget {
             ),
           ),
 
-          // Recently Added section
           SliverToBoxAdapter(
             child: Padding(
               padding: EdgeInsets.fromLTRB(
@@ -267,7 +287,10 @@ class HomeScreen extends ConsumerWidget {
                     ),
                   ),
                   GestureDetector(
-                    onTap: () {},
+                    onTap: () => context.push(
+                      AppRouter.search,
+                      extra: {'section': 'recent'},
+                    ),
                     child: Text(
                       'See all',
                       style: GoogleFonts.lato(
@@ -311,7 +334,6 @@ class HomeScreen extends ConsumerWidget {
     );
   }
 
-  // Responsive helpers
   static double _hPad(double w) => w > 600 ? 32 : 20;
   static double _heroFontSize(double w) => w > 600 ? 34 : 28;
   static double _featuredHeight(double w) {
@@ -320,7 +342,6 @@ class HomeScreen extends ConsumerWidget {
   }
 }
 
-/// Simple shimmer placeholder card
 class _ShimmerCard extends StatefulWidget {
   final double width;
   final double height;
