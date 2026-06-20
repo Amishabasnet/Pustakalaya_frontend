@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:pustakalaya/core/constants/app_colors.dart';
 import 'package:pustakalaya/core/constants/app_text_styles.dart';
+import 'package:pustakalaya/core/router/app_router.dart';
 import 'package:pustakalaya/features/onboarding/presentation/providers/onboarding_provider.dart';
 import 'package:pustakalaya/features/onboarding/presentation/widgets/onboarding_dot_indicator.dart';
 import 'package:pustakalaya/features/onboarding/presentation/widgets/onboarding_page_card.dart';
@@ -28,7 +30,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     super.dispose();
   }
 
-  void _onNext() {
+  Future<void> _onNext() async {
     final notifier = ref.read(onboardingNotifierProvider.notifier);
     final state = ref.read(onboardingNotifierProvider);
     final pages = ref.read(onboardingPagesProvider);
@@ -38,14 +40,16 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
         duration: const Duration(milliseconds: 400),
         curve: Curves.easeInOut,
       );
-      notifier.nextPage();
+      await notifier.nextPage();
     } else {
-      notifier.nextPage(); // triggers isComplete = true
+      await notifier.nextPage();
+      if (mounted) context.go(AppRouter.signIn);
     }
   }
 
-  void _onSkip() {
-    ref.read(onboardingNotifierProvider.notifier).skipOnboarding();
+  Future<void> _onSkip() async {
+    await ref.read(onboardingNotifierProvider.notifier).skipOnboarding();
+    if (mounted) context.go(AppRouter.signIn);
   }
 
   @override
@@ -53,20 +57,6 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     final pages = ref.watch(onboardingPagesProvider);
     final state = ref.watch(onboardingNotifierProvider);
     final isLastPage = state.currentIndex == pages.length - 1;
-
-    // React to onboarding completion
-    ref.listen(onboardingNotifierProvider, (prev, next) {
-      if (next.isComplete && mounted) {
-        // Navigate to your home screen here
-        // e.g. context.go(AppRouter.home);
-        // For now, show a snack bar as placeholder
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Onboarding complete! Navigate to Home.'),
-          ),
-        );
-      }
-    });
 
     return Scaffold(
       backgroundColor: AppColors.background,
