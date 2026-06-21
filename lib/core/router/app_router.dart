@@ -16,6 +16,8 @@ import 'package:pustakalaya/features/onboarding/presentation/pages/onboarding_sc
 import 'package:pustakalaya/features/orders/domain/entities/order_item.dart';
 import 'package:pustakalaya/features/orders/presentation/screens/my_orders_screen.dart';
 import 'package:pustakalaya/features/orders/presentation/screens/order_detail_screen.dart';
+import 'package:pustakalaya/features/payment_methods/presentation/screens/add_payment_method_screen.dart';
+import 'package:pustakalaya/features/payment_methods/presentation/screens/payment_method_screen.dart';
 import 'package:pustakalaya/features/profile/presentation/screens/edit_profile_screen.dart';
 import 'package:pustakalaya/features/search/presentation/screens/search_screen.dart';
 import 'package:pustakalaya/features/splash/presentation/pages/splash_screen.dart';
@@ -42,6 +44,8 @@ class AppRouter {
   static const String savedAddresses = '/saved-addresses';
   static const String addAddress = '/add-address';
   static const String editAddress = '/edit-address';
+  static const String paymentMethods = '/payment-methods';
+  static const String addPaymentMethod = '/add-payment-method';
 
   static final router = GoRouter(
     initialLocation: splash,
@@ -123,6 +127,14 @@ class AppRouter {
           final address = state.extra as AddressEntity?;
           return AddEditAddressScreen(existing: address);
         },
+      ),
+      GoRoute(
+        path: paymentMethods,
+        builder: (_, _) => const PaymentMethodsScreen(),
+      ),
+      GoRoute(
+        path: addPaymentMethod,
+        builder: (_, _) => const AddPaymentMethodScreen(),
       ),
     ],
   );
