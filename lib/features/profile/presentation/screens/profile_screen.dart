@@ -53,17 +53,20 @@ class ProfileScreen extends ConsumerWidget {
                       Positioned(
                         bottom: 0,
                         right: 0,
-                        child: Container(
-                          width: 26,
-                          height: 26,
-                          decoration: const BoxDecoration(
-                            color: Colors.white,
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(
-                            Icons.edit_rounded,
-                            size: 14,
-                            color: AppColors.primary,
+                        child: GestureDetector(
+                          onTap: () => context.push(AppRouter.editProfile),
+                          child: Container(
+                            width: 26,
+                            height: 26,
+                            decoration: const BoxDecoration(
+                              color: Colors.white,
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.edit_rounded,
+                              size: 14,
+                              color: AppColors.primary,
+                            ),
                           ),
                         ),
                       ),
@@ -126,7 +129,7 @@ class ProfileScreen extends ConsumerWidget {
                       _MenuItem(
                         icon: Icons.person_outline_rounded,
                         label: 'Edit Profile',
-                        onTap: () {},
+                        onTap: () => context.push(AppRouter.editProfile),
                       ),
                       _MenuItem(
                         icon: Icons.location_on_outlined,
