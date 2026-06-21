@@ -1,4 +1,7 @@
 import 'package:go_router/go_router.dart';
+import 'package:pustakalaya/features/address/domain/entities/address_entity.dart';
+import 'package:pustakalaya/features/address/presentation/screens/add_edit_address.dart';
+import 'package:pustakalaya/features/address/presentation/screens/saved_address_screen.dart';
 import 'package:pustakalaya/features/auth/presentation/screens/sign_in_screen.dart';
 import 'package:pustakalaya/features/auth/presentation/screens/sign_up_screen.dart';
 import 'package:pustakalaya/features/book_detail/presentation/screens/book_detail_screen.dart';
@@ -13,6 +16,9 @@ import 'package:pustakalaya/features/onboarding/presentation/pages/onboarding_sc
 import 'package:pustakalaya/features/orders/domain/entities/order_item.dart';
 import 'package:pustakalaya/features/orders/presentation/screens/my_orders_screen.dart';
 import 'package:pustakalaya/features/orders/presentation/screens/order_detail_screen.dart';
+import 'package:pustakalaya/features/payment_methods/presentation/screens/add_payment_method_screen.dart';
+import 'package:pustakalaya/features/payment_methods/presentation/screens/payment_method_screen.dart';
+import 'package:pustakalaya/features/profile/presentation/screens/edit_profile_screen.dart';
 import 'package:pustakalaya/features/search/presentation/screens/search_screen.dart';
 import 'package:pustakalaya/features/splash/presentation/pages/splash_screen.dart';
 
@@ -34,6 +40,12 @@ class AppRouter {
   static const String notifications = '/notifications';
   static const String search = '/search';
   static const String filter = '/filter';
+  static const String editProfile = '/edit-profile';
+  static const String savedAddresses = '/saved-addresses';
+  static const String addAddress = '/add-address';
+  static const String editAddress = '/edit-address';
+  static const String paymentMethods = '/payment-methods';
+  static const String addPaymentMethod = '/add-payment-method';
 
   static final router = GoRouter(
     initialLocation: splash,
@@ -100,6 +112,30 @@ class AppRouter {
         },
       ),
       GoRoute(path: filter, builder: (_, _) => const FilterScreen()),
+      GoRoute(path: editProfile, builder: (_, _) => const EditProfileScreen()),
+      GoRoute(
+        path: savedAddresses,
+        builder: (_, _) => const SavedAddressScreen(),
+      ),
+      GoRoute(
+        path: addAddress,
+        builder: (_, _) => const AddEditAddressScreen(),
+      ),
+      GoRoute(
+        path: editAddress,
+        builder: (context, state) {
+          final address = state.extra as AddressEntity?;
+          return AddEditAddressScreen(existing: address);
+        },
+      ),
+      GoRoute(
+        path: paymentMethods,
+        builder: (_, _) => const PaymentMethodsScreen(),
+      ),
+      GoRoute(
+        path: addPaymentMethod,
+        builder: (_, _) => const AddPaymentMethodScreen(),
+      ),
     ],
   );
 }

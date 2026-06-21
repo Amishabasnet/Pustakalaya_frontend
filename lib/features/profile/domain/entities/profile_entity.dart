@@ -14,4 +14,22 @@ class ProfileEntity {
     required this.wishlistCount,
     required this.reviewsCount,
   });
+
+  ProfileEntity copyWith({
+    String? name,
+    String? email,
+    String? phoneNumber,
+    int? totalOrders,
+    int? wishlistCount,
+    int? reviewsCount,
+  }) {
+    return ProfileEntity(
+      name: name ?? this.name,
+      email: email ?? this.email,
+      phoneNumber: phoneNumber ?? this.phoneNumber,
+      totalOrders: totalOrders ?? this.totalOrders,
+      wishlistCount: wishlistCount ?? this.wishlistCount,
+      reviewsCount: reviewsCount ?? this.reviewsCount,
+    );
+  }
 }
