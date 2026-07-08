@@ -43,7 +43,6 @@ class _MyOrdersScreenState extends ConsumerState<MyOrdersScreen> {
   @override
   Widget build(BuildContext context) {
     final activeTab = ref.watch(orderTabProvider);
-    final ordersAsync = ref.watch(ordersProvider);
 
     return Scaffold(
       backgroundColor: const Color(0xFFFAF0EA),
@@ -110,73 +109,119 @@ class _MyOrdersScreenState extends ConsumerState<MyOrdersScreen> {
             const SizedBox(height: 12),
 
             Expanded(
-              child: ordersAsync.when(
-                data: (allOrders) {
-                  final processingOrders = allOrders
-                      .where((o) => o.status.isProcessing)
-                      .toList();
-                  final deliveredOrders = allOrders
-                      .where((o) => o.status.isDelivered)
-                      .toList();
-
-                  final pages = [allOrders, processingOrders, deliveredOrders];
-
-                  return PageView.builder(
-                    controller: _pageController,
-                    itemCount: 3,
-                    onPageChanged: (i) =>
-                        ref.read(orderTabProvider.notifier).state = i,
-                    itemBuilder: (context, pageIndex) {
-                      final orders = pages[pageIndex];
-                      if (orders.isEmpty) {
-                        return _EmptyState(tabIndex: pageIndex);
-                      }
-                      return ListView.builder(
-                        physics: const BouncingScrollPhysics(),
-                        padding: const EdgeInsets.only(top: 4, bottom: 24),
-                        itemCount: orders.length,
-                        itemBuilder: (_, i) => OrderCard(
-                          order: orders[i],
-                          onTap: () {
-                            context.push(
-                              AppRouter.orderDetail,
-                              extra: orders[i],
-                            );
-                          },
-                        ),
-                      );
-                    },
-                  );
-                },
-                loading: () => ListView.builder(
-                  padding: const EdgeInsets.only(top: 4),
-                  itemCount: 3,
-                  itemBuilder: (_, __) => const _ShimmerOrderCard(),
-                ),
-                error: (_, __) => Center(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.error_outline_rounded,
-                        size: 52,
-                        color: AppColors.textMedium.withOpacity(0.35),
-                      ),
-                      const SizedBox(height: 12),
-                      Text(
-                        'Could not load orders',
-                        style: GoogleFonts.lato(
-                          fontSize: 14,
-                          color: AppColors.textMedium,
-                        ),
-                      ),
-                    ],
-                  ),
+              child: PageView.builder(
+                controller: _pageController,
+                itemCount: 3,
+                onPageChanged: (i) =>
+                    ref.read(orderTabProvider.notifier).state = i,
+                itemBuilder: (context, pageIndex) => _OrderTabList(
+                  tabIndex: pageIndex,
                 ),
               ),
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _OrderTabList extends ConsumerStatefulWidget {
+  final int tabIndex;
+  const _OrderTabList({required this.tabIndex});
+
+  @override
+  ConsumerState<_OrderTabList> createState() => _OrderTabListState();
+}
+
+class _OrderTabListState extends ConsumerState<_OrderTabList> {
+  final _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (!_scrollController.hasClients) return;
+    final threshold = _scrollController.position.maxScrollExtent - 200;
+    if (_scrollController.position.pixels >= threshold) {
+      ref.read(ordersListProvider(widget.tabIndex).notifier).loadMore();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final state = ref.watch(ordersListProvider(widget.tabIndex));
+
+    if (state.orders.isEmpty && state.isLoadingMore) {
+      return ListView.builder(
+        padding: const EdgeInsets.only(top: 4),
+        itemCount: 3,
+        itemBuilder: (_, __) => const _ShimmerOrderCard(),
+      );
+    }
+
+    if (state.orders.isEmpty && state.error != null) {
+      return Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.error_outline_rounded,
+              size: 52,
+              color: AppColors.textMedium.withOpacity(0.35),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'Could not load orders',
+              style: GoogleFonts.lato(fontSize: 14, color: AppColors.textMedium),
+            ),
+          ],
+        ),
+      );
+    }
+
+    if (state.orders.isEmpty) {
+      return _EmptyState(tabIndex: widget.tabIndex);
+    }
+
+    return RefreshIndicator(
+      onRefresh: () => ref.read(ordersListProvider(widget.tabIndex).notifier).refresh(),
+      child: ListView.builder(
+        controller: _scrollController,
+        physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+        padding: const EdgeInsets.only(top: 4, bottom: 24),
+        itemCount: state.orders.length + (state.hasMore ? 1 : 0),
+        itemBuilder: (_, i) {
+          if (i >= state.orders.length) {
+            return const Padding(
+              padding: EdgeInsets.symmetric(vertical: 20),
+              child: Center(
+                child: SizedBox(
+                  width: 22,
+                  height: 22,
+                  child: CircularProgressIndicator(strokeWidth: 2.4),
+                ),
+              ),
+            );
+          }
+          final order = state.orders[i];
+          return OrderCard(
+            order: order,
+            onTap: () {
+              context.push(AppRouter.orderDetail, extra: order);
+            },
+          );
+        },
       ),
     );
   }

@@ -1,10 +1,19 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
+import 'package:pustakalaya/core/network/api_exception.dart';
 import 'package:pustakalaya/features/filter/domain/entities/filter_state.dart';
 import 'package:pustakalaya/features/filter/presentation/providers/filter_provider.dart';
 import 'package:pustakalaya/features/home/domain/entities/book_entity.dart';
 import 'package:pustakalaya/features/home/presentation/providers/home_provider.dart';
+import 'package:pustakalaya/features/search/data/repositories/search_repository_impl.dart';
+import 'package:pustakalaya/features/search/domain/repositories/search_repository.dart';
 
+final searchRepositoryProvider = Provider<SearchRepository>(
+  (ref) => SearchRepositoryImpl(),
+);
+
+// Kept for the "Featured" / "Recently added" section shortcuts on the
+// search screen, which still just reuse the home catalog.
 final allBooksProvider = Provider<AsyncValue<List<BookEntity>>>((ref) {
   final featured = ref.watch(featuredBooksProvider);
   final recent = ref.watch(recentlyAddedProvider);
@@ -12,7 +21,6 @@ final allBooksProvider = Provider<AsyncValue<List<BookEntity>>>((ref) {
   return featured.when(
     data: (f) => recent.when(
       data: (r) {
-        // Merge, dedup by id
         final seen = <String>{};
         final all = [...f, ...r].where((b) => seen.add(b.id)).toList();
         return AsyncValue.data(all);
@@ -25,116 +33,146 @@ final allBooksProvider = Provider<AsyncValue<List<BookEntity>>>((ref) {
   );
 });
 
+/// Recent searches, backed by the account's search history on the server.
 class RecentSearchesNotifier extends StateNotifier<List<String>> {
-  RecentSearchesNotifier()
-    : super([
-        'Art history',
-        'The Alchemist',
-        'Atomic Habits',
-        'It Ends With Us',
-        'Fiction',
-      ]);
-
-  void add(String query) {
-    if (query.trim().isEmpty) return;
-    final updated = [
-      query.trim(),
-      ...state.where((s) => s.toLowerCase() != query.trim().toLowerCase()),
-    ].take(10).toList();
-    state = updated;
+  final SearchRepository _repo;
+  RecentSearchesNotifier(this._repo) : super([]) {
+    refresh();
   }
 
-  void remove(String query) {
+  Future<void> refresh() async {
+    try {
+      state = await _repo.getRecentSearches();
+    } on ApiException {
+      // Not signed in, or request failed — just show an empty history.
+      state = [];
+    }
+  }
+
+  /// The backend records history automatically whenever `search()` is
+  /// called with a query while signed in, so this just refreshes the
+  /// locally-cached list to match.
+  void add(String query) => refresh();
+
+  Future<void> remove(String query) async {
     state = state.where((s) => s != query).toList();
+    try {
+      await _repo.removeRecentSearch(query);
+    } on ApiException {
+      await refresh();
+    }
   }
 
-  void clearAll() => state = [];
+  Future<void> clearAll() async {
+    state = [];
+    try {
+      await _repo.clearRecentSearches();
+    } on ApiException {
+      await refresh();
+    }
+  }
 }
 
 final recentSearchesProvider =
     StateNotifierProvider<RecentSearchesNotifier, List<String>>(
-      (ref) => RecentSearchesNotifier(),
+      (ref) => RecentSearchesNotifier(ref.watch(searchRepositoryProvider)),
     );
 
 final searchQueryProvider = StateProvider<String>((ref) => '');
 
 final sectionFilterProvider = StateProvider<String?>((ref) => null);
 
-bool _matchesFilter(BookEntity book, FilterState filter) {
-  // Writer (matches against author name)
-  if (filter.selectedWriters.isNotEmpty &&
-      !filter.selectedWriters.any(
-        (w) => book.author.toLowerCase() == w.toLowerCase(),
-      )) {
-    return false;
-  }
+class SearchResultsState {
+  final List<BookEntity> books;
+  final bool isLoadingMore;
+  final bool hasMore;
+  final int page;
 
-  if (filter.selectedGenres.isNotEmpty &&
-      !filter.selectedGenres.any(
-        (g) => book.genre.toLowerCase() == g.toLowerCase(),
-      )) {
-    return false;
-  }
+  const SearchResultsState({
+    this.books = const [],
+    this.isLoadingMore = false,
+    this.hasMore = true,
+    this.page = 0,
+  });
 
-  if (filter.selectedRating > 0 && book.rating < filter.selectedRating) {
-    return false;
-  }
-
-  if (filter.selectedPrices.isNotEmpty) {
-    final matchesPrice = filter.selectedPrices.any((p) {
-      switch (p) {
-        case PriceRange.high:
-          return book.price >= 1000;
-        case PriceRange.medium:
-          return book.price >= 500 && book.price <= 999;
-        case PriceRange.low:
-          return book.price < 500;
-      }
-    });
-    if (!matchesPrice) return false;
-  }
-
-  return true;
+  SearchResultsState copyWith({
+    List<BookEntity>? books,
+    bool? isLoadingMore,
+    bool? hasMore,
+    int? page,
+  }) => SearchResultsState(
+    books: books ?? this.books,
+    isLoadingMore: isLoadingMore ?? this.isLoadingMore,
+    hasMore: hasMore ?? this.hasMore,
+    page: page ?? this.page,
+  );
 }
 
-final searchResultsProvider = Provider<List<BookEntity>>((ref) {
-  final query = ref.watch(searchQueryProvider).toLowerCase().trim();
-  final allAsync = ref.watch(allBooksProvider);
+/// Live, paginated search against the full catalog on the server — resets
+/// and reloads page 1 whenever the query or filter changes, and supports
+/// `loadMore()` for infinite scroll.
+class SearchResultsNotifier extends StateNotifier<SearchResultsState> {
+  final SearchRepository _repo;
+  final String _query;
+  final FilterState _filter;
+  final void Function() _onSearched;
+
+  SearchResultsNotifier(this._repo, this._query, this._filter, this._onSearched)
+    : super(const SearchResultsState()) {
+    if (_query.trim().isNotEmpty) loadMore();
+  }
+
+  Future<void> loadMore() async {
+    if (state.isLoadingMore || !state.hasMore) return;
+    state = state.copyWith(isLoadingMore: true);
+
+    final nextPage = state.page + 1;
+    final page = await _repo.search(_query, _filter, page: nextPage);
+    _onSearched();
+
+    state = state.copyWith(
+      books: [...state.books, ...page.books],
+      page: page.page,
+      hasMore: page.hasMore,
+      isLoadingMore: false,
+    );
+  }
+}
+
+final searchResultsProvider =
+    StateNotifierProvider.autoDispose<
+      SearchResultsNotifier,
+      SearchResultsState
+    >((ref) {
+      final query = ref.watch(searchQueryProvider);
+      final filter = ref.watch(filterProvider);
+      return SearchResultsNotifier(
+        ref.watch(searchRepositoryProvider),
+        query,
+        filter,
+        () => ref.read(recentSearchesProvider.notifier).refresh(),
+      );
+    });
+
+/// Backs the three filter tabs (Popular / New released / On sale).
+final filteredBrowseProvider = FutureProvider.autoDispose<List<BookEntity>>((
+  ref,
+) async {
   final filter = ref.watch(filterProvider);
+  final repo = ref.watch(searchRepositoryProvider);
 
-  if (query.isEmpty) return [];
-
-  return allAsync.maybeWhen(
-    data: (books) => books
-        .where(
-          (b) =>
-              b.title.toLowerCase().contains(query) ||
-              b.author.toLowerCase().contains(query) ||
-              b.genre.toLowerCase().contains(query),
-        )
-        .where((b) => _matchesFilter(b, filter))
-        .toList(),
-    orElse: () => [],
-  );
+  switch (filter.activeTab) {
+    case FilterTab.popular:
+      return repo.getPopular(filter);
+    case FilterTab.newReleased:
+      return repo.getNewReleased(filter);
+    case FilterTab.onSale:
+      return repo.getOnSale(filter);
+  }
 });
 
-final filteredBrowseProvider = Provider<AsyncValue<List<BookEntity>>>((ref) {
-  final allAsync = ref.watch(allBooksProvider);
-  final filter = ref.watch(filterProvider);
-
-  return allAsync.whenData((books) {
-    if (!filter.hasActiveFilters) {
-      final sorted = [...books]..sort((a, b) => b.rating.compareTo(a.rating));
-      return sorted.take(6).toList();
-    }
-    return books.where((b) => _matchesFilter(b, filter)).toList();
-  });
-});
-
-final highlyRecommendedProvider = Provider<AsyncValue<List<BookEntity>>>((ref) {
-  final allAsync = ref.watch(allBooksProvider);
-  return allAsync.whenData((books) {
-    final sorted = [...books]..sort((a, b) => b.rating.compareTo(a.rating));
-    return sorted.take(6).toList();
-  });
+final highlyRecommendedProvider = FutureProvider.autoDispose<List<BookEntity>>((
+  ref,
+) {
+  return ref.watch(searchRepositoryProvider).getHighlyRecommended();
 });

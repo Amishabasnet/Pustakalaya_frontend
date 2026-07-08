@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:pustakalaya/core/constants/app_colors.dart';
 import 'package:pustakalaya/core/router/app_router.dart';
 import 'package:pustakalaya/features/profile/presentation/providers/profile_provider.dart';
+import 'package:pustakalaya/features/auth/presentation/providers/auth_provider.dart';
 
 
 class ProfileScreen extends ConsumerWidget {
@@ -220,7 +221,10 @@ class ProfileScreen extends ConsumerWidget {
                     width: double.infinity,
                     height: 50,
                     child: OutlinedButton.icon(
-                      onPressed: () => context.go(AppRouter.signIn),
+                      onPressed: () async {
+                        await ref.read(authRepositoryProvider).signOut();
+                        if (context.mounted) context.go(AppRouter.signIn);
+                      },
                       icon: const Icon(
                         Icons.logout_rounded,
                         color: Colors.red,

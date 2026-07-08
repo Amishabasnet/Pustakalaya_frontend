@@ -70,7 +70,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     final query = ref.watch(searchQueryProvider);
     final sectionFilter = ref.watch(sectionFilterProvider);
     final recentSearches = ref.watch(recentSearchesProvider);
-    final results = ref.watch(searchResultsProvider);
+    final resultsState = ref.watch(searchResultsProvider);
+    final results = resultsState.books;
     final recommendedAsync = ref.watch(filteredBrowseProvider);
     final activeFilters = ref.watch(filterProvider);
     final screenW = MediaQuery.of(context).size.width;
@@ -275,6 +276,9 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                       hPad: hPad,
                       onTap: _navigateToBook,
                       onQueryTap: _onSearch,
+                      hasMore: resultsState.hasMore,
+                      isLoadingMore: resultsState.isLoadingMore,
+                      onLoadMore: () => ref.read(searchResultsProvider.notifier).loadMore(),
                     )
                   : hasSectionFilter
                   ? _SectionView(
@@ -492,6 +496,9 @@ class _SearchResults extends StatelessWidget {
   final double hPad;
   final Function(dynamic) onTap;
   final ValueChanged<String> onQueryTap;
+  final bool hasMore;
+  final bool isLoadingMore;
+  final VoidCallback onLoadMore;
 
   const _SearchResults({
     required this.results,
@@ -499,6 +506,9 @@ class _SearchResults extends StatelessWidget {
     required this.hPad,
     required this.onTap,
     required this.onQueryTap,
+    this.hasMore = false,
+    this.isLoadingMore = false,
+    required this.onLoadMore,
   });
 
   @override
@@ -541,29 +551,51 @@ class _SearchResults extends StatelessWidget {
       );
     }
 
-    return ListView(
-      physics: const BouncingScrollPhysics(),
-      padding: EdgeInsets.fromLTRB(hPad, 16, hPad, 32),
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(bottom: 12),
-          child: Text(
-            '${results.length} result${results.length == 1 ? '' : 's'} for "$query"',
-            style: GoogleFonts.lato(
-              fontSize: 12,
-              color: AppColors.textMedium,
-              fontWeight: FontWeight.w500,
+    return NotificationListener<ScrollNotification>(
+      onNotification: (notification) {
+        if (hasMore &&
+            !isLoadingMore &&
+            notification.metrics.pixels >=
+                notification.metrics.maxScrollExtent - 200) {
+          onLoadMore();
+        }
+        return false;
+      },
+      child: ListView(
+        physics: const BouncingScrollPhysics(),
+        padding: EdgeInsets.fromLTRB(hPad, 16, hPad, 32),
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(bottom: 12),
+            child: Text(
+              '${results.length} result${results.length == 1 ? '' : 's'} for "$query"',
+              style: GoogleFonts.lato(
+                fontSize: 12,
+                color: AppColors.textMedium,
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ),
-        ),
-        ...results.map(
-          (book) => SearchResultTile(
-            book: book,
-            query: query,
-            onTap: () => onTap(book),
+          ...results.map(
+            (book) => SearchResultTile(
+              book: book,
+              query: query,
+              onTap: () => onTap(book),
+            ),
           ),
-        ),
-      ],
+          if (isLoadingMore)
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 20),
+              child: Center(
+                child: SizedBox(
+                  width: 22,
+                  height: 22,
+                  child: CircularProgressIndicator(strokeWidth: 2.4),
+                ),
+              ),
+            ),
+        ],
+      ),
     );
   }
 }

@@ -1,11 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pustakalaya/core/constants/app_colors.dart';
 import 'package:pustakalaya/features/orders/domain/entities/order_item.dart';
+import 'package:pustakalaya/features/orders/presentation/providers/orders_provider.dart';
 
-class OrderDetailScreen extends StatelessWidget {
+class OrderDetailScreen extends ConsumerStatefulWidget {
   final OrderItem order;
   const OrderDetailScreen({super.key, required this.order});
+
+  @override
+  ConsumerState<OrderDetailScreen> createState() => _OrderDetailScreenState();
+}
+
+class _OrderDetailScreenState extends ConsumerState<OrderDetailScreen> {
+  bool _isCancelling = false;
+
+  OrderItem get order => widget.order;
 
   Color get _coverColor {
     final hex = order.coverColor.replaceFirst('#', '');
@@ -15,6 +26,46 @@ class OrderDetailScreen extends StatelessWidget {
   bool get _isDark {
     final c = _coverColor;
     return (0.299 * c.red + 0.587 * c.green + 0.114 * c.blue) / 255 < 0.55;
+  }
+
+  Future<void> _confirmCancel(BuildContext context) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Cancel this order?'),
+        content: const Text(
+          "This can't be undone. The books will be returned to stock.",
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('No, keep it'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Yes, cancel'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+
+    setState(() => _isCancelling = true);
+    try {
+      await cancelOrderAndRefresh(ref, order.id);
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Order cancelled.')),
+      );
+      Navigator.of(context).maybePop();
+    } catch (e) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Couldn't cancel this order. Please try again.")),
+      );
+    } finally {
+      if (mounted) setState(() => _isCancelling = false);
+    }
   }
 
   @override
@@ -231,6 +282,38 @@ class OrderDetailScreen extends StatelessWidget {
           ],
         ),
       ),
+      bottomNavigationBar: order.isCancellable
+          ? SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(20, 8, 20, 12),
+                child: SizedBox(
+                  height: 48,
+                  child: OutlinedButton(
+                    onPressed: _isCancelling ? null : () => _confirmCancel(context),
+                    style: OutlinedButton.styleFrom(
+                      side: const BorderSide(color: Colors.redAccent),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: _isCancelling
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : Text(
+                            'Cancel Order',
+                            style: GoogleFonts.lato(
+                              fontWeight: FontWeight.w700,
+                              color: Colors.redAccent,
+                            ),
+                          ),
+                  ),
+                ),
+              ),
+            )
+          : null,
     );
   }
 }
