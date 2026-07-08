@@ -5,6 +5,8 @@ class ProfileEntity {
   final int totalOrders;
   final int wishlistCount;
   final int reviewsCount;
+  final String? username;
+  final String? address;
 
   const ProfileEntity({
     required this.name,
@@ -13,6 +15,8 @@ class ProfileEntity {
     required this.totalOrders,
     required this.wishlistCount,
     required this.reviewsCount,
+    this.username,
+    this.address,
   });
 
   ProfileEntity copyWith({
@@ -22,6 +26,8 @@ class ProfileEntity {
     int? totalOrders,
     int? wishlistCount,
     int? reviewsCount,
+    String? username,
+    String? address,
   }) {
     return ProfileEntity(
       name: name ?? this.name,
@@ -30,6 +36,8 @@ class ProfileEntity {
       totalOrders: totalOrders ?? this.totalOrders,
       wishlistCount: wishlistCount ?? this.wishlistCount,
       reviewsCount: reviewsCount ?? this.reviewsCount,
+      username: username ?? this.username,
+      address: address ?? this.address,
     );
   }
 }

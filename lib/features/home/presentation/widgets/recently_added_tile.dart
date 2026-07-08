@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:pustakalaya/core/constants/app_colors.dart';
 import 'package:pustakalaya/features/home/domain/entities/book_entity.dart';
 import 'package:pustakalaya/features/home/presentation/providers/home_provider.dart';
+import 'package:pustakalaya/features/wishlist/presentation/providers/wishlist_provider.dart';
 import 'package:pustakalaya/features/home/presentation/widgets/verified_badge.dart';
 
 class RecentlyAddedTile extends ConsumerWidget {
@@ -18,8 +19,8 @@ class RecentlyAddedTile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final wishlistIds = ref.watch(homeWishlistIdsProvider);
-    final isWishlisted = wishlistIds.contains(book.id);
+    final wishlistItems = ref.watch(wishlistProvider);
+    final isWishlisted = wishlistItems.any((i) => i.book.id == book.id);
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -37,7 +38,7 @@ class RecentlyAddedTile extends ConsumerWidget {
       ),
       child: Row(
         children: [
-          // Small cover 
+          // Small cover
           ClipRRect(
             borderRadius: BorderRadius.circular(10),
             child: Container(
@@ -80,7 +81,7 @@ class RecentlyAddedTile extends ConsumerWidget {
           ),
           const SizedBox(width: 14),
 
-          // Info 
+          // Info
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -121,12 +122,10 @@ class RecentlyAddedTile extends ConsumerWidget {
             ),
           ),
 
-          // Heart 
+          // Heart
           GestureDetector(
             onTap: () {
-              final ids = Set<String>.from(wishlistIds);
-              isWishlisted ? ids.remove(book.id) : ids.add(book.id);
-              ref.read(homeWishlistIdsProvider.notifier).state = ids;
+              ref.read(wishlistProvider.notifier).toggle(book);
             },
             child: Padding(
               padding: const EdgeInsets.only(left: 8),

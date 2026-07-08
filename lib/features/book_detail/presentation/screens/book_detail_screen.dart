@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pustakalaya/core/constants/app_colors.dart';
+import 'package:pustakalaya/core/network/api_exception.dart';
 import 'package:pustakalaya/features/book_detail/presentation/providers/book_detail_provider.dart';
 import 'package:pustakalaya/features/book_detail/presentation/widgets/accordion_section.dart';
 import 'package:pustakalaya/features/book_detail/presentation/widgets/quantity_stepper.dart';
@@ -14,10 +15,28 @@ class BookDetailScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final detail = ref.watch(bookDetailProvider);
+    final detailAsync = ref.watch(bookDetailProvider);
     final quantity = ref.watch(bookQuantityProvider);
     final accordion = ref.watch(accordionProvider);
     final wishlistItems = ref.watch(wishlistProvider);
+
+    if (detailAsync.hasError) {
+      return Scaffold(
+        backgroundColor: const Color(0xFFF7F3EF),
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Text(
+              "Couldn't load this book. Please go back and try again.",
+              textAlign: TextAlign.center,
+              style: GoogleFonts.lato(color: AppColors.textMedium),
+            ),
+          ),
+        ),
+      );
+    }
+
+    final detail = detailAsync.asData?.value;
 
     if (detail == null) {
       return const Scaffold(
@@ -370,16 +389,44 @@ class BookDetailScreen extends ConsumerWidget {
 
               SliverToBoxAdapter(
                 child: AccordionSection(
-                  title: 'Reviews (${detail.reviews.length * 64})',
+                  title: 'Reviews (${book.reviewCount})',
                   isExpanded: accordion[2] ?? true,
                   onToggle: () => ref.read(accordionProvider.notifier).state = {
                     ...accordion,
                     2: !(accordion[2] ?? true),
                   },
                   child: Column(
-                    children: detail.reviews
-                        .map((r) => ReviewCard(review: r))
-                        .toList(),
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 14),
+                        child: SizedBox(
+                          width: double.infinity,
+                          child: OutlinedButton.icon(
+                            onPressed: () =>
+                                _showWriteReviewSheet(context, ref, book.id),
+                            icon: const Icon(
+                              Icons.rate_review_outlined,
+                              size: 18,
+                            ),
+                            label: Text(
+                              'Write a Review',
+                              style: GoogleFonts.lato(
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: AppColors.primary,
+                              side: const BorderSide(color: AppColors.primary),
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      ...detail.reviews.map((r) => ReviewCard(review: r)),
+                    ],
                   ),
                 ),
               ),
@@ -413,9 +460,9 @@ class BookDetailScreen extends ConsumerWidget {
                     child: ElevatedButton(
                       onPressed: () {
                         // Add to cart
-                        for (var i = 0; i < quantity; i++) {
-                          ref.read(cartProvider.notifier).add(book);
-                        }
+                        ref
+                            .read(cartProvider.notifier)
+                            .add(book, quantity: quantity);
                         // Reset quantity
                         ref.read(bookQuantityProvider.notifier).state = 1;
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -549,6 +596,241 @@ class _DecorCircle extends StatelessWidget {
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         color: Colors.white.withValues(alpha: opacity),
+      ),
+    );
+  }
+}
+
+void _showWriteReviewSheet(BuildContext context, WidgetRef ref, String bookId) {
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.transparent,
+    builder: (ctx) => _WriteReviewSheet(bookId: bookId),
+  );
+}
+
+class _WriteReviewSheet extends ConsumerStatefulWidget {
+  final String bookId;
+  const _WriteReviewSheet({required this.bookId});
+
+  @override
+  ConsumerState<_WriteReviewSheet> createState() => _WriteReviewSheetState();
+}
+
+class _WriteReviewSheetState extends ConsumerState<_WriteReviewSheet> {
+  int _rating = 0;
+  final _commentController = TextEditingController();
+  bool _isSubmitting = false;
+  bool _isDeleting = false;
+
+  @override
+  void dispose() {
+    _commentController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _submit() async {
+    if (_rating == 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please select a star rating.')),
+      );
+      return;
+    }
+    setState(() => _isSubmitting = true);
+    try {
+      await ref
+          .read(bookDetailRepositoryProvider)
+          .submitReview(
+            widget.bookId,
+            rating: _rating,
+            comment: _commentController.text.trim().isEmpty
+                ? null
+                : _commentController.text.trim(),
+          );
+      ref.invalidate(bookDetailProvider);
+      if (!mounted) return;
+      Navigator.of(context).pop();
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Thanks for your review!')));
+    } on ApiException catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(e.message)));
+    } finally {
+      if (mounted) setState(() => _isSubmitting = false);
+    }
+  }
+
+  Future<void> _delete() async {
+    setState(() => _isDeleting = true);
+    try {
+      await ref
+          .read(bookDetailRepositoryProvider)
+          .deleteMyReview(widget.bookId);
+      ref.invalidate(bookDetailProvider);
+      if (!mounted) return;
+      Navigator.of(context).pop();
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Your review was deleted.')));
+    } on ApiException catch (e) {
+      if (!mounted) return;
+      final message = e.statusCode == 404
+          ? "You haven't reviewed this book yet."
+          : e.message;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(message)));
+    } finally {
+      if (mounted) setState(() => _isDeleting = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom,
+      ),
+      child: Container(
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Container(
+                width: 40,
+                height: 4,
+                margin: const EdgeInsets.only(bottom: 16),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFE8DDD5),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+              ),
+            ),
+            Text(
+              'Write a Review',
+              style: GoogleFonts.playfairDisplay(
+                fontSize: 20,
+                fontWeight: FontWeight.w700,
+                color: AppColors.textDark,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              "If you've already reviewed this book, submitting again updates your review.",
+              style: GoogleFonts.lato(
+                fontSize: 12,
+                color: AppColors.textMedium,
+              ),
+            ),
+            const SizedBox(height: 18),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(5, (i) {
+                final starIndex = i + 1;
+                return IconButton(
+                  onPressed: () => setState(() => _rating = starIndex),
+                  icon: Icon(
+                    starIndex <= _rating
+                        ? Icons.star_rounded
+                        : Icons.star_border_rounded,
+                    color: const Color(0xFFF5A623),
+                    size: 34,
+                  ),
+                );
+              }),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: _commentController,
+              maxLines: 4,
+              style: GoogleFonts.lato(fontSize: 14, color: AppColors.textDark),
+              decoration: InputDecoration(
+                hintText: 'Share your thoughts about this book (optional)',
+                hintStyle: GoogleFonts.lato(
+                  fontSize: 13,
+                  color: AppColors.textMedium,
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(color: Color(0xFFEEE8E0)),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(color: Color(0xFFEEE8E0)),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(
+                    color: AppColors.primary,
+                    width: 1.5,
+                  ),
+                ),
+                filled: true,
+                fillColor: const Color(0xFFFAF7F3),
+              ),
+            ),
+            const SizedBox(height: 16),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: _isSubmitting ? null : _submit,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: _isSubmitting
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2.2,
+                          color: Colors.white,
+                        ),
+                      )
+                    : Text(
+                        'Submit Review',
+                        style: GoogleFonts.lato(
+                          fontWeight: FontWeight.w800,
+                          color: Colors.white,
+                        ),
+                      ),
+              ),
+            ),
+            const SizedBox(height: 8),
+            SizedBox(
+              width: double.infinity,
+              child: TextButton(
+                onPressed: _isDeleting ? null : _delete,
+                child: _isDeleting
+                    ? const SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : Text(
+                        'Delete my review',
+                        style: GoogleFonts.lato(
+                          color: Colors.redAccent,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

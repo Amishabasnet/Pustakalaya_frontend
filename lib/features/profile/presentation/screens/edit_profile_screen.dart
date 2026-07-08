@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pustakalaya/core/constants/app_colors.dart';
+import 'package:pustakalaya/core/network/api_exception.dart';
 import 'package:pustakalaya/features/auth/presentation/widgets/auth_primary_button.dart';
 import 'package:pustakalaya/features/auth/presentation/widgets/auth_text_field.dart';
 import 'package:pustakalaya/features/profile/presentation/providers/profile_provider.dart';
@@ -18,6 +19,8 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   late final TextEditingController _nameCtrl;
   late final TextEditingController _emailCtrl;
   late final TextEditingController _phoneCtrl;
+  late final TextEditingController _usernameCtrl;
+  late final TextEditingController _addressCtrl;
   bool _isSaving = false;
 
   @override
@@ -27,6 +30,8 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     _nameCtrl = TextEditingController(text: profile.name);
     _emailCtrl = TextEditingController(text: profile.email);
     _phoneCtrl = TextEditingController(text: profile.phoneNumber);
+    _usernameCtrl = TextEditingController(text: profile.username ?? '');
+    _addressCtrl = TextEditingController(text: profile.address ?? '');
   }
 
   @override
@@ -34,6 +39,8 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     _nameCtrl.dispose();
     _emailCtrl.dispose();
     _phoneCtrl.dispose();
+    _usernameCtrl.dispose();
+    _addressCtrl.dispose();
     super.dispose();
   }
 
@@ -41,30 +48,42 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     if (!(_formKey.currentState?.validate() ?? false)) return;
 
     setState(() => _isSaving = true);
-    // Simulate a brief network round-trip so the loading state is visible.
-    await Future.delayed(const Duration(milliseconds: 600));
 
-    ref.read(profileProvider.notifier).updateProfile(
-          name: _nameCtrl.text.trim(),
-          email: _emailCtrl.text.trim(),
-          phoneNumber: _phoneCtrl.text.trim(),
-        );
+    try {
+      await ref.read(profileProvider.notifier).updateProfile(
+            name: _nameCtrl.text.trim(),
+            email: _emailCtrl.text.trim(),
+            phoneNumber: _phoneCtrl.text.trim(),
+            username: _usernameCtrl.text.trim(),
+            address: _addressCtrl.text.trim(),
+          );
 
-    if (!mounted) return;
-    setState(() => _isSaving = false);
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          'Profile updated successfully',
-          style: GoogleFonts.lato(color: Colors.white),
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Profile updated successfully',
+            style: GoogleFonts.lato(color: Colors.white),
+          ),
+          backgroundColor: const Color(0xFF27AE60),
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         ),
-        backgroundColor: const Color(0xFF27AE60),
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      ),
-    );
-    Navigator.of(context).maybePop();
+      );
+      Navigator.of(context).maybePop();
+    } on ApiException catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.message, style: GoogleFonts.lato(color: Colors.white)),
+          backgroundColor: Colors.redAccent,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        ),
+      );
+    } finally {
+      if (mounted) setState(() => _isSaving = false);
+    }
   }
 
   @override
@@ -221,6 +240,33 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                         textInputAction: TextInputAction.done,
                         validator: (v) => (v == null || v.trim().length < 7)
                             ? 'Enter a valid phone number'
+                            : null,
+                      ),
+                      const SizedBox(height: 16),
+                      AuthTextField(
+                        label: 'Username (optional)',
+                        controller: _usernameCtrl,
+                        hint: 'lowercase, numbers, dots, underscores',
+                        validator: (v) {
+                          if (v == null || v.trim().isEmpty) return null;
+                          final value = v.trim();
+                          if (value.length < 3 || value.length > 30) {
+                            return 'Username must be 3\u201330 characters';
+                          }
+                          if (!RegExp(r'^[a-z0-9_.]+$').hasMatch(value)) {
+                            return 'Only lowercase letters, numbers, dots, underscores';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      AuthTextField(
+                        label: 'Address (optional)',
+                        controller: _addressCtrl,
+                        hint: 'Street, city, province',
+                        textInputAction: TextInputAction.done,
+                        validator: (v) => (v != null && v.trim().length > 255)
+                            ? 'Address must be under 255 characters'
                             : null,
                       ),
                       const SizedBox(height: 32),

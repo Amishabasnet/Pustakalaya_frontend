@@ -5,6 +5,7 @@ import 'package:pustakalaya/core/constants/app_colors.dart';
 import 'package:pustakalaya/core/constants/app_text_styles.dart';
 import 'package:pustakalaya/core/router/app_router.dart';
 import 'package:pustakalaya/features/onboarding/presentation/providers/onboarding_provider.dart';
+import 'package:pustakalaya/features/auth/presentation/providers/auth_provider.dart';
 
 class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
@@ -41,8 +42,16 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
       if (!mounted) return;
       final repo = ref.read(onboardingRepositoryProvider);
       final completed = await repo.isOnboardingComplete();
+      if (!completed) {
+        if (!mounted) return;
+        context.go(AppRouter.onboarding);
+        return;
+      }
+
+      final authRepo = ref.read(authRepositoryProvider);
+      final user = await authRepo.getCurrentUser();
       if (!mounted) return;
-      context.go(completed ? AppRouter.home : AppRouter.onboarding);
+      context.go(user != null ? AppRouter.home : AppRouter.signIn);
     });
   }
 
