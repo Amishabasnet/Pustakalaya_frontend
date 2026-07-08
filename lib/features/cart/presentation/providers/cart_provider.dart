@@ -1,78 +1,95 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
+import 'package:pustakalaya/core/network/api_exception.dart';
+import 'package:pustakalaya/features/cart/data/repositories/cart_repository_impl.dart';
 import 'package:pustakalaya/features/cart/domain/entities/cart_item.dart';
+import 'package:pustakalaya/features/cart/domain/repositories/cart_repository.dart';
 import 'package:pustakalaya/features/home/domain/entities/book_entity.dart';
 
+final cartRepositoryProvider = Provider<CartRepository>(
+  (ref) => CartRepositoryImpl(),
+);
+
+/// Non-null while a cart mutation is in flight or just failed, so the UI can
+/// show a spinner / error banner without changing the `List<CartItem>` state
+/// shape that every screen already depends on.
+final cartLoadingProvider = StateProvider<bool>((ref) => false);
+final cartErrorProvider = StateProvider<String?>((ref) => null);
+
 class CartNotifier extends StateNotifier<List<CartItem>> {
-  CartNotifier() : super(_demoItems());
+  final CartRepository _repo;
 
-  static List<CartItem> _demoItems() => [
-    CartItem(
-      book: const BookEntity(
-        id: 'f1',
-        title: 'Atomic Habits',
-        author: 'James Clear',
-        price: 599,
-        rating: 4.8,
-        reviewCount: 2341,
-        genre: 'Self-Help',
-        coverColor: '#3B5998',
-      ),
-      quantity: 1,
-    ),
-    CartItem(
-      book: const BookEntity(
-        id: 't1',
-        title: 'Rich Dad Poor Dad',
-        author: 'Robert Kiyosaki',
-        price: 399,
-        rating: 4.5,
-        reviewCount: 3201,
-        genre: 'Finance',
-        coverColor: '#C0392B',
-      ),
-      quantity: 2,
-    ),
-  ];
+  CartNotifier(this._repo, this._ref) : super([]) {
+    refresh();
+  }
 
-  void add(BookEntity book, {required int quantity}) {
-    final idx = state.indexWhere((i) => i.book.id == book.id);
-    if (idx >= 0) {
-      final updated = List<CartItem>.from(state);
-      updated[idx] = updated[idx].copyWith(quantity: updated[idx].quantity + 1);
-      state = updated;
-    } else {
-      state = [...state, CartItem(book: book, quantity: 1)];
+  final Ref _ref;
+
+  Future<void> refresh() async {
+    _ref.read(cartLoadingProvider.notifier).state = true;
+    try {
+      state = await _repo.getCart();
+      _ref.read(cartErrorProvider.notifier).state = null;
+    } on ApiException catch (e) {
+      _ref.read(cartErrorProvider.notifier).state = e.message;
+    } finally {
+      _ref.read(cartLoadingProvider.notifier).state = false;
     }
   }
 
-  void increment(String bookId) {
-    state = state
-        .map(
-          (i) => i.book.id == bookId ? i.copyWith(quantity: i.quantity + 1) : i,
-        )
-        .toList();
+  Future<void> add(BookEntity book, {int quantity = 1}) async {
+    _ref.read(cartLoadingProvider.notifier).state = true;
+    try {
+      state = await _repo.addToCart(book, quantity: quantity);
+      _ref.read(cartErrorProvider.notifier).state = null;
+    } on ApiException catch (e) {
+      _ref.read(cartErrorProvider.notifier).state = e.message;
+    } finally {
+      _ref.read(cartLoadingProvider.notifier).state = false;
+    }
   }
 
-  void decrement(String bookId) {
+  Future<void> increment(String bookId) async {
+    final item = state.firstWhere((i) => i.book.id == bookId);
+    await _setQuantity(bookId, item.quantity + 1);
+  }
+
+  Future<void> decrement(String bookId) async {
     final item = state.firstWhere((i) => i.book.id == bookId);
     if (item.quantity <= 1) {
-      remove(bookId);
+      await remove(bookId);
     } else {
-      state = state
-          .map(
-            (i) =>
-                i.book.id == bookId ? i.copyWith(quantity: i.quantity - 1) : i,
-          )
-          .toList();
+      await _setQuantity(bookId, item.quantity - 1);
     }
   }
 
-  void remove(String bookId) {
-    state = state.where((i) => i.book.id != bookId).toList();
+  Future<void> _setQuantity(String bookId, int quantity) async {
+    try {
+      state = await _repo.updateQuantity(bookId, quantity);
+      _ref.read(cartErrorProvider.notifier).state = null;
+    } on ApiException catch (e) {
+      _ref.read(cartErrorProvider.notifier).state = e.message;
+    }
   }
 
-  void clear() => state = [];
+  Future<void> remove(String bookId) async {
+    try {
+      state = await _repo.removeItem(bookId);
+      _ref.read(cartErrorProvider.notifier).state = null;
+    } on ApiException catch (e) {
+      _ref.read(cartErrorProvider.notifier).state = e.message;
+    }
+  }
+
+  Future<void> clear() async {
+    try {
+      await _repo.clearCart();
+      state = [];
+      _ref.read(cartErrorProvider.notifier).state = null;
+    } on ApiException catch (e) {
+      _ref.read(cartErrorProvider.notifier).state = e.message;
+    }
+  }
 
   double get total => state.fold(0, (sum, item) => sum + item.subtotal);
 
@@ -80,7 +97,7 @@ class CartNotifier extends StateNotifier<List<CartItem>> {
 }
 
 final cartProvider = StateNotifierProvider<CartNotifier, List<CartItem>>(
-  (ref) => CartNotifier(),
+  (ref) => CartNotifier(ref.watch(cartRepositoryProvider), ref),
 );
 
 final cartTotalProvider = Provider<double>((ref) {

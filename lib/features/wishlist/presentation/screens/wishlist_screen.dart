@@ -33,7 +33,7 @@ class _WishlistScreenState extends ConsumerState<WishlistScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            // Title 
+            // Title
             Padding(
               padding: EdgeInsets.fromLTRB(hPad, 24, hPad, 20),
               child: Text(
@@ -46,7 +46,7 @@ class _WishlistScreenState extends ConsumerState<WishlistScreen> {
               ),
             ),
 
-            // Search bar 
+            // Search bar
             Padding(
               padding: EdgeInsets.fromLTRB(hPad, 0, hPad, 20),
               child: Container(
@@ -74,9 +74,8 @@ class _WishlistScreenState extends ConsumerState<WishlistScreen> {
                     Expanded(
                       child: TextField(
                         controller: _searchCtrl,
-                        onChanged: (v) => ref
-                            .read(wishlistSearchProvider.notifier)
-                            .state = v,
+                        onChanged: (v) =>
+                            ref.read(wishlistSearchProvider.notifier).state = v,
                         style: GoogleFonts.lato(
                           fontSize: 14,
                           color: AppColors.textDark,
@@ -98,9 +97,7 @@ class _WishlistScreenState extends ConsumerState<WishlistScreen> {
                       GestureDetector(
                         onTap: () {
                           _searchCtrl.clear();
-                          ref
-                              .read(wishlistSearchProvider.notifier)
-                              .state = '';
+                          ref.read(wishlistSearchProvider.notifier).state = '';
                         },
                         child: Padding(
                           padding: const EdgeInsets.only(right: 14),
@@ -118,44 +115,45 @@ class _WishlistScreenState extends ConsumerState<WishlistScreen> {
               ),
             ),
 
-            // Book list 
+            // Book list
             Expanded(
               child: allItems.isEmpty
                   ? _EmptyState()
                   : items.isEmpty
-                      ? _NoResultsState(query: _searchCtrl.text)
-                      : ListView.builder(
-                          physics: const BouncingScrollPhysics(),
-                          padding: const EdgeInsets.only(bottom: 20),
-                          itemCount: items.length,
-                          itemBuilder: (context, i) {
-                            final item = items[i];
-                            return Dismissible(
-                              key: Key(item.book.id),
-                              direction: DismissDirection.endToStart,
-                              background: Container(
-                                margin: const EdgeInsets.symmetric(
-                                    horizontal: 20, vertical: 7),
-                                alignment: Alignment.centerRight,
-                                padding:
-                                    const EdgeInsets.only(right: 24),
-                                decoration: BoxDecoration(
-                                  color: Colors.red.shade400,
-                                  borderRadius: BorderRadius.circular(16),
-                                ),
-                                child: const Icon(
-                                  Icons.delete_outline_rounded,
-                                  color: Colors.white,
-                                  size: 26,
-                                ),
-                              ),
-                              onDismissed: (_) => ref
-                                  .read(wishlistProvider.notifier)
-                                  .remove(item.book.id),
-                              child: WishlistBookCard(item: item),
-                            );
-                          },
-                        ),
+                  ? _NoResultsState(query: _searchCtrl.text)
+                  : ListView.builder(
+                      physics: const BouncingScrollPhysics(),
+                      padding: const EdgeInsets.only(bottom: 20),
+                      itemCount: items.length,
+                      itemBuilder: (context, i) {
+                        final item = items[i];
+                        return Dismissible(
+                          key: Key(item.book.id),
+                          direction: DismissDirection.endToStart,
+                          background: Container(
+                            margin: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 7,
+                            ),
+                            alignment: Alignment.centerRight,
+                            padding: const EdgeInsets.only(right: 24),
+                            decoration: BoxDecoration(
+                              color: Colors.red.shade400,
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            child: const Icon(
+                              Icons.delete_outline_rounded,
+                              color: Colors.white,
+                              size: 26,
+                            ),
+                          ),
+                          onDismissed: (_) => ref
+                              .read(wishlistProvider.notifier)
+                              .remove(item.book.id),
+                          child: WishlistBookCard(item: item),
+                        );
+                      },
+                    ),
             ),
           ],
         ),
@@ -196,10 +194,7 @@ class _EmptyState extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             'Save books you love to find them here',
-            style: GoogleFonts.lato(
-              fontSize: 14,
-              color: AppColors.textMedium,
-            ),
+            style: GoogleFonts.lato(fontSize: 14, color: AppColors.textMedium),
           ),
         ],
       ),
@@ -217,8 +212,11 @@ class _NoResultsState extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.search_off_rounded,
-              size: 56, color: AppColors.textMedium.withValues(alpha: 0.4)),
+          Icon(
+            Icons.search_off_rounded,
+            size: 56,
+            color: AppColors.textMedium.withValues(alpha: 0.4),
+          ),
           const SizedBox(height: 16),
           Text(
             'No results for "$query"',

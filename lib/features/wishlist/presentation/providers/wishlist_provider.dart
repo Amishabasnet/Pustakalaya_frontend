@@ -1,77 +1,67 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
+import 'package:pustakalaya/core/network/api_exception.dart';
 import 'package:pustakalaya/features/home/domain/entities/book_entity.dart';
+import 'package:pustakalaya/features/wishlist/data/repositories/wishlist_repository_impl.dart';
 import 'package:pustakalaya/features/wishlist/domain/entities/wishlist_item.dart';
+import 'package:pustakalaya/features/wishlist/domain/repositories/wishlist_repository.dart';
+
+final wishlistRepositoryProvider = Provider<WishlistRepository>(
+  (ref) => WishlistRepositoryImpl(),
+);
+
+final wishlistErrorProvider = StateProvider<String?>((ref) => null);
 
 class WishlistNotifier extends StateNotifier<List<WishlistItem>> {
-  WishlistNotifier() : super(_demoItems());
+  final WishlistRepository _repo;
+  final Ref _ref;
 
-  static List<WishlistItem> _demoItems() => [
-        WishlistItem(
-          book: const BookEntity(
-            id: 'w1',
-            title: 'The Subtle Art Of Not Giving A Fu*k',
-            author: 'J.K. Rowling',
-            price: 880,
-            rating: 0,
-            reviewCount: 0,
-            genre: 'Self-Help',
-            coverColor: '#E8602C',
-            isVerified: true,
-          ),
-          addedAt: DateTime.now().subtract(const Duration(days: 1)),
-          userRating: 0,
-        ),
-        WishlistItem(
-          book: const BookEntity(
-            id: 'w2',
-            title: 'Ikigai',
-            author: 'Hector Garcia Puigcerver',
-            price: 958,
-            rating: 0,
-            reviewCount: 0,
-            genre: 'Self-Help',
-            coverColor: '#D6E8F0',
-            isVerified: true,
-          ),
-          addedAt: DateTime.now().subtract(const Duration(days: 4)),
-          userRating: 0,
-        ),
-        WishlistItem(
-          book: const BookEntity(
-            id: 'w3',
-            title: 'The Alchemist',
-            author: 'Paulo Coelho',
-            price: 650,
-            rating: 0,
-            reviewCount: 0,
-            genre: 'Fiction',
-            coverColor: '#C0392B',
-            isVerified: true,
-          ),
-          addedAt: DateTime.now().subtract(const Duration(days: 7)),
-          userRating: 0,
-        ),
-      ];
+  WishlistNotifier(this._repo, this._ref) : super([]) {
+    refresh();
+  }
+
+  Future<void> refresh() async {
+    try {
+      state = await _repo.getWishlist();
+      _ref.read(wishlistErrorProvider.notifier).state = null;
+    } on ApiException catch (e) {
+      _ref.read(wishlistErrorProvider.notifier).state = e.message;
+    }
+  }
 
   bool isWishlisted(String bookId) =>
       state.any((item) => item.book.id == bookId);
 
-  void toggle(BookEntity book) {
-    if (isWishlisted(book.id)) {
+  /// Optimistically flips membership, then reconciles with the server.
+  Future<void> toggle(BookEntity book) async {
+    final wasWishlisted = isWishlisted(book.id);
+    if (wasWishlisted) {
       state = state.where((item) => item.book.id != book.id).toList();
     } else {
       state = [
         ...state,
-        WishlistItem(book: book, addedAt: DateTime.now(), userRating: 0),
+        WishlistItem(book: book, addedAt: DateTime.now()),
       ];
+    }
+
+    try {
+      await _repo.toggle(book);
+      _ref.read(wishlistErrorProvider.notifier).state = null;
+    } on ApiException catch (e) {
+      // Roll back the optimistic update on failure.
+      await refresh();
+      _ref.read(wishlistErrorProvider.notifier).state = e.message;
     }
   }
 
-  void remove(String bookId) {
-    state = state.where((item) => item.book.id != bookId).toList();
+  Future<void> remove(String bookId) async {
+    final matches = state.where((i) => i.book.id == bookId);
+    if (matches.isEmpty) return;
+    await toggle(matches.first.book);
   }
 
+  /// Personal star rating kept locally — the backend has no per-wishlist
+  /// rating field (ratings live on Reviews, tied to a written review).
   void setRating(String bookId, int rating) {
     state = state
         .map((item) =>
@@ -82,7 +72,7 @@ class WishlistNotifier extends StateNotifier<List<WishlistItem>> {
 
 final wishlistProvider =
     StateNotifierProvider<WishlistNotifier, List<WishlistItem>>(
-  (ref) => WishlistNotifier(),
+  (ref) => WishlistNotifier(ref.watch(wishlistRepositoryProvider), ref),
 );
 
 // Search query for wishlist
