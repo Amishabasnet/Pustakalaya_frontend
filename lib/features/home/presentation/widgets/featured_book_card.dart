@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:pustakalaya/core/constants/app_colors.dart';
 import 'package:pustakalaya/features/home/domain/entities/book_entity.dart';
 import 'package:pustakalaya/features/home/presentation/providers/home_provider.dart';
+import 'package:pustakalaya/features/wishlist/presentation/providers/wishlist_provider.dart';
 import 'package:pustakalaya/features/home/presentation/widgets/verified_badge.dart';
 
 class FeaturedBookCard extends ConsumerWidget {
@@ -18,8 +19,8 @@ class FeaturedBookCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final wishlistIds = ref.watch(homeWishlistIdsProvider);
-    final isWishlisted = wishlistIds.contains(book.id);
+    final wishlistItems = ref.watch(wishlistProvider);
+    final isWishlisted = wishlistItems.any((i) => i.book.id == book.id);
     final screenW = MediaQuery.of(context).size.width;
     // Responsive card width: ~42% of screen, min 150, max 180
     final cardW = (screenW * 0.42).clamp(150.0, 185.0);
@@ -41,10 +42,9 @@ class FeaturedBookCard extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Book cover 
+          // Book cover
           ClipRRect(
-            borderRadius:
-                const BorderRadius.vertical(top: Radius.circular(14)),
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(14)),
             child: Stack(
               children: [
                 _BookCoverIllustration(
@@ -59,9 +59,7 @@ class FeaturedBookCard extends ConsumerWidget {
                   right: 8,
                   child: GestureDetector(
                     onTap: () {
-                      final ids = Set<String>.from(wishlistIds);
-                      isWishlisted ? ids.remove(book.id) : ids.add(book.id);
-                      ref.read(homeWishlistIdsProvider.notifier).state = ids;
+                      ref.read(wishlistProvider.notifier).toggle(book);
                     },
                     child: Container(
                       width: 30,
@@ -75,9 +73,7 @@ class FeaturedBookCard extends ConsumerWidget {
                             ? Icons.favorite_rounded
                             : Icons.favorite_border_rounded,
                         size: 16,
-                        color: isWishlisted
-                            ? Colors.red
-                            : AppColors.textMedium,
+                        color: isWishlisted ? Colors.red : AppColors.textMedium,
                       ),
                     ),
                   ),
@@ -86,7 +82,7 @@ class FeaturedBookCard extends ConsumerWidget {
             ),
           ),
 
-          // Info section 
+          // Info section
           Padding(
             padding: const EdgeInsets.fromLTRB(10, 8, 10, 10),
             child: Column(
@@ -151,6 +147,25 @@ class _BookCoverIllustration extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (book.coverImageUrl != null) {
+      return SizedBox(
+        width: width,
+        height: height,
+        child: Image.network(
+          book.coverImageUrl!,
+          fit: BoxFit.cover,
+          errorBuilder: (_, __, ___) => _illustration(),
+          loadingBuilder: (context, child, progress) {
+            if (progress == null) return child;
+            return _illustration();
+          },
+        ),
+      );
+    }
+    return _illustration();
+  }
+
+  Widget _illustration() {
     return Container(
       width: width,
       height: height,
@@ -158,10 +173,7 @@ class _BookCoverIllustration extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [
-            color,
-            Color.lerp(color, Colors.black, 0.35)!,
-          ],
+          colors: [color, Color.lerp(color, Colors.black, 0.35)!],
         ),
       ),
       child: Stack(
