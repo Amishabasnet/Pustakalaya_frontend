@@ -22,4 +22,6 @@ class BookEntity {
     this.isVerified = true,
     this.isNew = false,
   });
+
+  static fromJson(Map<String, dynamic> bookJson) {}
 }
