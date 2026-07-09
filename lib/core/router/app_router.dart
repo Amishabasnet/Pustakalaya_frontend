@@ -30,6 +30,8 @@ class AppRouter {
   static const String signUp = '/sign-up';
   static const String signIn = '/sign-in';
   static const String home = '/home';
+  static const String wishlist = '/wishlist';
+  static const String profile = '/profile';
   static const String myOrders = '/my-orders';
   static const String orderDetail = '/order-detail';
   static const String bookDetail = '/book-detail';
@@ -55,6 +57,8 @@ class AppRouter {
       GoRoute(path: signUp, builder: (_, _) => const SignUpScreen()),
       GoRoute(path: signIn, builder: (_, _) => const SignInScreen()),
       GoRoute(path: home, builder: (_, _) => const AppShell()),
+      GoRoute(path: wishlist, builder: (_, _) => const AppShell(initialTab: 1)),
+      GoRoute(path: profile, builder: (_, _) => const AppShell(initialTab: 3)),
       GoRoute(path: myOrders, builder: (_, _) => const MyOrdersScreen()),
       GoRoute(
         path: orderDetail,

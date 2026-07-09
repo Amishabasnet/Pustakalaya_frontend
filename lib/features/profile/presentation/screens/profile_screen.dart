@@ -7,7 +7,6 @@ import 'package:pustakalaya/core/router/app_router.dart';
 import 'package:pustakalaya/features/profile/presentation/providers/profile_provider.dart';
 import 'package:pustakalaya/features/auth/presentation/providers/auth_provider.dart';
 
-
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
 
@@ -42,7 +41,9 @@ class ProfileScreen extends ConsumerWidget {
                         ),
                         child: Center(
                           child: Text(
-                            profile.name[0],
+                            profile.name.isNotEmpty
+                                ? profile.name[0].toUpperCase()
+                                : '?',
                             style: GoogleFonts.playfairDisplay(
                               fontSize: 36,
                               fontWeight: FontWeight.w700,
