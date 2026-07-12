@@ -42,6 +42,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
 
     ref.listen(signInNotifierProvider, (prev, next) {
       if (next.isSuccess) {
+        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Welcome back! 📚'),
@@ -49,8 +50,11 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
           ),
         );
         ref.read(signInNotifierProvider.notifier).reset();
-        // Navigate to home
+        if (mounted) {
+          context.go(AppRouter.home);
+        }
       } else if (next.status == AuthStatus.failure && next.failure != null) {
+        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(next.failure!.message),

@@ -17,9 +17,14 @@ class WeakPasswordFailure extends AuthFailure {
 }
 
 class ServerFailure extends AuthFailure {
-  const ServerFailure([super.msg = 'Something went wrong. Please try again.']);
+  const ServerFailure([
+    String message = 'Something went wrong. Please try again.',
+  ]) : super(message);
 }
 
 class NetworkFailure extends AuthFailure {
-  const NetworkFailure() : super('No internet connection.');
+  const NetworkFailure()
+    : super(
+        'Couldn\'t reach the server. Make sure the backend is running and the API URL is correct.\nIf you\'re running the app in a browser, ensure the backend allows CORS or set `API_BASE_URL` via `--dart-define` to a reachable address.',
+      );
 }
