@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -8,6 +10,8 @@ import 'package:pustakalaya/features/book_detail/presentation/widgets/accordion_
 import 'package:pustakalaya/features/book_detail/presentation/widgets/quantity_stepper.dart';
 import 'package:pustakalaya/features/book_detail/presentation/widgets/review_card.dart';
 import 'package:pustakalaya/features/cart/presentation/providers/cart_provider.dart';
+import 'package:pustakalaya/features/profile/presentation/providers/profile_provider.dart';
+import 'package:pustakalaya/features/reviews/presentation/providers/my_reviews_provider.dart';
 import 'package:pustakalaya/features/wishlist/presentation/providers/wishlist_provider.dart';
 
 class BookDetailScreen extends ConsumerWidget {
@@ -649,6 +653,8 @@ class _WriteReviewSheetState extends ConsumerState<_WriteReviewSheet> {
                 : _commentController.text.trim(),
           );
       ref.invalidate(bookDetailProvider);
+      ref.invalidate(myReviewsProvider);
+      unawaited(ref.read(profileProvider.notifier).refresh());
       if (!mounted) return;
       Navigator.of(context).pop();
       ScaffoldMessenger.of(
@@ -671,6 +677,8 @@ class _WriteReviewSheetState extends ConsumerState<_WriteReviewSheet> {
           .read(bookDetailRepositoryProvider)
           .deleteMyReview(widget.bookId);
       ref.invalidate(bookDetailProvider);
+      ref.invalidate(myReviewsProvider);
+      unawaited(ref.read(profileProvider.notifier).refresh());
       if (!mounted) return;
       Navigator.of(context).pop();
       ScaffoldMessenger.of(

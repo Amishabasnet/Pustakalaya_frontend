@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pustakalaya/core/constants/app_colors.dart';
 import 'package:pustakalaya/core/router/app_router.dart';
-import 'package:pustakalaya/features/orders/domain/entities/order_item.dart';
 import 'package:pustakalaya/features/orders/presentation/providers/orders_provider.dart';
 import 'package:pustakalaya/features/orders/presentation/widgets/order_card.dart';
 import 'package:pustakalaya/features/orders/presentation/widgets/order_tab_bar.dart';
@@ -114,9 +113,8 @@ class _MyOrdersScreenState extends ConsumerState<MyOrdersScreen> {
                 itemCount: 3,
                 onPageChanged: (i) =>
                     ref.read(orderTabProvider.notifier).state = i,
-                itemBuilder: (context, pageIndex) => _OrderTabList(
-                  tabIndex: pageIndex,
-                ),
+                itemBuilder: (context, pageIndex) =>
+                    _OrderTabList(tabIndex: pageIndex),
               ),
             ),
           ],
@@ -183,7 +181,10 @@ class _OrderTabListState extends ConsumerState<_OrderTabList> {
             const SizedBox(height: 12),
             Text(
               'Could not load orders',
-              style: GoogleFonts.lato(fontSize: 14, color: AppColors.textMedium),
+              style: GoogleFonts.lato(
+                fontSize: 14,
+                color: AppColors.textMedium,
+              ),
             ),
           ],
         ),
@@ -195,10 +196,13 @@ class _OrderTabListState extends ConsumerState<_OrderTabList> {
     }
 
     return RefreshIndicator(
-      onRefresh: () => ref.read(ordersListProvider(widget.tabIndex).notifier).refresh(),
+      onRefresh: () =>
+          ref.read(ordersListProvider(widget.tabIndex).notifier).refresh(),
       child: ListView.builder(
         controller: _scrollController,
-        physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+        physics: const AlwaysScrollableScrollPhysics(
+          parent: BouncingScrollPhysics(),
+        ),
         padding: const EdgeInsets.only(top: 4, bottom: 24),
         itemCount: state.orders.length + (state.hasMore ? 1 : 0),
         itemBuilder: (_, i) {
