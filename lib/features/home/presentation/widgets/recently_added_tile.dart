@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pustakalaya/core/constants/app_colors.dart';
 import 'package:pustakalaya/features/home/domain/entities/book_entity.dart';
-import 'package:pustakalaya/features/home/presentation/providers/home_provider.dart';
 import 'package:pustakalaya/features/wishlist/presentation/providers/wishlist_provider.dart';
 import 'package:pustakalaya/features/home/presentation/widgets/verified_badge.dart';
 

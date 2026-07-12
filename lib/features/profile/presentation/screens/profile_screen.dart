@@ -157,13 +157,13 @@ class ProfileScreen extends ConsumerWidget {
                       _MenuItem(
                         icon: Icons.replay_outlined,
                         label: 'Return & Refund',
-                        onTap: () {},
+                        onTap: () => context.push(AppRouter.returnSupport),
                       ),
                       _MenuItem(
                         icon: Icons.rate_review_outlined,
                         label: 'My Reviews',
                         badge: '${profile.reviewsCount}',
-                        onTap: () {},
+                        onTap: () => context.push(AppRouter.myReviews),
                       ),
                     ],
                   ),
@@ -175,7 +175,7 @@ class ProfileScreen extends ConsumerWidget {
                       _MenuItem(
                         icon: Icons.notifications_outlined,
                         label: 'Notifications',
-                        onTap: () {},
+                        onTap: () => context.push(AppRouter.notifications),
                       ),
                       _MenuItem(
                         icon: Icons.dark_mode_outlined,

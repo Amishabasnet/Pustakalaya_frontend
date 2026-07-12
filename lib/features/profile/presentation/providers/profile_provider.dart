@@ -33,6 +33,7 @@ class ProfileNotifier extends StateNotifier<ProfileEntity> {
 
     int ordersPlaced = 0;
     int booksWishlisted = 0;
+    int reviewsWritten = state.reviewsCount;
     try {
       final body = await _ref
           .read(profileApiClientProvider)
@@ -40,6 +41,8 @@ class ProfileNotifier extends StateNotifier<ProfileEntity> {
       ordersPlaced = (body['data']?['ordersPlaced'] as num?)?.toInt() ?? 0;
       booksWishlisted =
           (body['data']?['booksWishlisted'] as num?)?.toInt() ?? 0;
+      reviewsWritten =
+          (body['data']?['reviewsWritten'] as num?)?.toInt() ?? reviewsWritten;
     } on ApiException {
       // Stats are a nice-to-have — profile still renders without them.
     }
@@ -50,7 +53,7 @@ class ProfileNotifier extends StateNotifier<ProfileEntity> {
       phoneNumber: user.phoneNumber,
       totalOrders: ordersPlaced,
       wishlistCount: booksWishlisted,
-      reviewsCount: state.reviewsCount,
+      reviewsCount: reviewsWritten,
       username: user.username,
       address: user.address,
     );

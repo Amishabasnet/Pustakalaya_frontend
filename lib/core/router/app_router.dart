@@ -19,6 +19,7 @@ import 'package:pustakalaya/features/orders/presentation/screens/order_detail_sc
 import 'package:pustakalaya/features/payment_methods/presentation/screens/add_payment_method_screen.dart';
 import 'package:pustakalaya/features/payment_methods/presentation/screens/payment_method_screen.dart';
 import 'package:pustakalaya/features/profile/presentation/screens/edit_profile_screen.dart';
+import 'package:pustakalaya/features/reviews/presentation/screens/my_reviews_screen.dart';
 import 'package:pustakalaya/features/search/presentation/screens/search_screen.dart';
 import 'package:pustakalaya/features/splash/presentation/pages/splash_screen.dart';
 import 'package:pustakalaya/features/support/presentation/screens/return_support_screen.dart';
@@ -48,6 +49,7 @@ class AppRouter {
   static const String paymentMethods = '/payment-methods';
   static const String addPaymentMethod = '/add-payment-method';
   static const String returnSupport = '/return-support';
+  static const String myReviews = '/my-reviews';
 
   static final router = GoRouter(
     initialLocation: splash,
@@ -142,6 +144,7 @@ class AppRouter {
         path: returnSupport,
         builder: (_, _) => const ReturnSupportScreen(),
       ),
+      GoRoute(path: myReviews, builder: (_, _) => const MyReviewsScreen()),
     ],
   );
 }
