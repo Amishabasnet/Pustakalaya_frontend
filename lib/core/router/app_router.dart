@@ -21,6 +21,7 @@ import 'package:pustakalaya/features/payment_methods/presentation/screens/paymen
 import 'package:pustakalaya/features/profile/presentation/screens/edit_profile_screen.dart';
 import 'package:pustakalaya/features/search/presentation/screens/search_screen.dart';
 import 'package:pustakalaya/features/splash/presentation/pages/splash_screen.dart';
+import 'package:pustakalaya/features/support/presentation/screens/return_support_screen.dart';
 
 class AppRouter {
   AppRouter._();
@@ -30,8 +31,6 @@ class AppRouter {
   static const String signUp = '/sign-up';
   static const String signIn = '/sign-in';
   static const String home = '/home';
-  static const String wishlist = '/wishlist';
-  static const String profile = '/profile';
   static const String myOrders = '/my-orders';
   static const String orderDetail = '/order-detail';
   static const String bookDetail = '/book-detail';
@@ -48,6 +47,7 @@ class AppRouter {
   static const String editAddress = '/edit-address';
   static const String paymentMethods = '/payment-methods';
   static const String addPaymentMethod = '/add-payment-method';
+  static const String returnSupport = '/return-support';
 
   static final router = GoRouter(
     initialLocation: splash,
@@ -57,8 +57,6 @@ class AppRouter {
       GoRoute(path: signUp, builder: (_, _) => const SignUpScreen()),
       GoRoute(path: signIn, builder: (_, _) => const SignInScreen()),
       GoRoute(path: home, builder: (_, _) => const AppShell()),
-      GoRoute(path: wishlist, builder: (_, _) => const AppShell(initialTab: 1)),
-      GoRoute(path: profile, builder: (_, _) => const AppShell(initialTab: 3)),
       GoRoute(path: myOrders, builder: (_, _) => const MyOrdersScreen()),
       GoRoute(
         path: orderDetail,
@@ -139,6 +137,10 @@ class AppRouter {
       GoRoute(
         path: addPaymentMethod,
         builder: (_, _) => const AddPaymentMethodScreen(),
+      ),
+      GoRoute(
+        path: returnSupport,
+        builder: (_, _) => const ReturnSupportScreen(),
       ),
     ],
   );

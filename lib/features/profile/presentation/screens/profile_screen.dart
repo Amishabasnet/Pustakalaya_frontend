@@ -41,9 +41,7 @@ class ProfileScreen extends ConsumerWidget {
                         ),
                         child: Center(
                           child: Text(
-                            profile.name.isNotEmpty
-                                ? profile.name[0].toUpperCase()
-                                : '?',
+                            profile.name[0],
                             style: GoogleFonts.playfairDisplay(
                               fontSize: 36,
                               fontWeight: FontWeight.w700,
@@ -208,6 +206,11 @@ class ProfileScreen extends ConsumerWidget {
                         icon: Icons.help_outline_rounded,
                         label: 'Help & FAQ',
                         onTap: () {},
+                      ),
+                      _MenuItem(
+                        icon: Icons.assignment_return_outlined,
+                        label: 'Return & Support',
+                        onTap: () => context.push(AppRouter.returnSupport),
                       ),
                       _MenuItem(
                         icon: Icons.info_outline_rounded,
