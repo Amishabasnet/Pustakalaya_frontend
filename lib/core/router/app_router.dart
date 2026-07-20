@@ -69,11 +69,8 @@ class AppRouter {
       ),
       GoRoute(path: bookDetail, builder: (_, _) => const BookDetailScreen()),
       GoRoute(path: cart, builder: (_, _) => const CartScreen()),
-      // Canonical checkout — reads cart total via cartTotalProvider directly.
-      GoRoute(
-        path: checkout,
-        builder: (_, _) => const CheckoutScreen(grandTotal: 0.0),
-      ),
+      // Canonical checkout — reads cart items and total via cart providers directly.
+      GoRoute(path: checkout, builder: (_, _) => const CheckoutScreen()),
       GoRoute(
         path: confirmation,
         builder: (context, state) {
@@ -85,6 +82,10 @@ class AppRouter {
             orderId: orderId,
             total: total,
             paymentMethod: paymentMethod,
+            bookTitle: (extra?['bookTitle'] as String?) ?? 'Your Order',
+            bookAuthor: (extra?['bookAuthor'] as String?) ?? '',
+            bookColor: (extra?['bookColor'] as String?) ?? '#E8602C',
+            placedDate: (extra?['placedDate'] as String?) ?? '',
           );
         },
       ),

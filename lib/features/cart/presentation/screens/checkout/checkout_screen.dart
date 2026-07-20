@@ -8,7 +8,6 @@ import 'package:pustakalaya/core/constants/app_colors.dart';
 import 'package:pustakalaya/core/router/app_router.dart';
 import 'package:pustakalaya/features/cart/presentation/providers/cart_provider.dart';
 
-
 enum DeliveryOption { standard, express }
 
 enum PaymentMethod { esewa, khalti, card, cod }
@@ -28,12 +27,11 @@ class CheckoutState {
     DeliveryOption? delivery,
     PaymentMethod? payment,
     String? address,
-  }) =>
-      CheckoutState(
-        delivery: delivery ?? this.delivery,
-        payment: payment ?? this.payment,
-        address: address ?? this.address,
-      );
+  }) => CheckoutState(
+    delivery: delivery ?? this.delivery,
+    payment: payment ?? this.payment,
+    address: address ?? this.address,
+  );
 }
 
 class CheckoutNotifier extends StateNotifier<CheckoutState> {
@@ -46,8 +44,8 @@ class CheckoutNotifier extends StateNotifier<CheckoutState> {
 
 final checkoutProvider =
     StateNotifierProvider.autoDispose<CheckoutNotifier, CheckoutState>(
-  (ref) => CheckoutNotifier(),
-);
+      (ref) => CheckoutNotifier(),
+    );
 
 class CheckoutScreen extends ConsumerStatefulWidget {
   final double grandTotal;
@@ -75,7 +73,9 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
     final isTablet = screenW > 600;
 
     // Delivery fee
-    final deliveryFee = state.delivery == DeliveryOption.standard ? 120.0 : 200.0;
+    final deliveryFee = state.delivery == DeliveryOption.standard
+        ? 120.0
+        : 200.0;
     final cartTotal = widget.grandTotal - 120.0; // strip old standard fee
     final orderTotal = cartTotal + deliveryFee;
 
@@ -86,8 +86,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
           children: [
             Container(
               color: Colors.white,
-              padding:
-                  EdgeInsets.symmetric(horizontal: hPad, vertical: 14),
+              padding: EdgeInsets.symmetric(horizontal: hPad, vertical: 14),
               child: Row(
                 children: [
                   _BackBtn(onTap: () => Navigator.of(context).maybePop()),
@@ -134,17 +133,16 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
 
       bottomNavigationBar: Container(
         color: Colors.white,
-        padding: EdgeInsets.fromLTRB(
-            hPad, 12, hPad, mq.padding.bottom + 12),
+        padding: EdgeInsets.fromLTRB(hPad, 12, hPad, mq.padding.bottom + 12),
         child: SizedBox(
           height: 52,
           child: ElevatedButton(
-            onPressed: () =>
-                _onConfirmPressed(context, ref, orderTotal),
+            onPressed: () => _onConfirmPressed(context, ref, orderTotal),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primary,
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12)),
+                borderRadius: BorderRadius.circular(12),
+              ),
               elevation: 0,
             ),
             child: Text(
@@ -162,8 +160,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
     );
   }
 
-  void _onConfirmPressed(
-      BuildContext context, WidgetRef ref, double total) {
+  void _onConfirmPressed(BuildContext context, WidgetRef ref, double total) {
     final state = ref.read(checkoutProvider);
 
     // Guard: address required
@@ -183,147 +180,162 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
   void _showSnack(BuildContext context, String msg) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(msg,
-            style: GoogleFonts.lato(
-                fontWeight: FontWeight.w600, color: Colors.white)),
+        content: Text(
+          msg,
+          style: GoogleFonts.lato(
+            fontWeight: FontWeight.w600,
+            color: Colors.white,
+          ),
+        ),
         backgroundColor: AppColors.primary,
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         margin: const EdgeInsets.all(16),
       ),
     );
   }
 
-  void _showConfirmDialog(
-      BuildContext context, WidgetRef ref, double total) {
+  void _showConfirmDialog(BuildContext context, WidgetRef ref, double total) {
+    var isSubmitting = false;
     showDialog(
       context: context,
-      barrierDismissible: true,
-      builder: (ctx) => Dialog(
-        backgroundColor: Colors.transparent,
-        insetPadding:
-            const EdgeInsets.symmetric(horizontal: 28, vertical: 24),
-        child: Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: [
-              BoxShadow(
+      barrierDismissible: false,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setDialogState) => Dialog(
+          backgroundColor: Colors.transparent,
+          insetPadding: const EdgeInsets.symmetric(
+            horizontal: 28,
+            vertical: 24,
+          ),
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
                   color: Colors.black.withValues(alpha: 0.12),
                   blurRadius: 24,
-                  offset: const Offset(0, 8))
-            ],
-          ),
-          padding: const EdgeInsets.all(28),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Icon
-              Container(
-                width: 64,
-                height: 64,
-                decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.1),
-                  shape: BoxShape.circle,
+                  offset: const Offset(0, 8),
                 ),
-                child: const Icon(Icons.shopping_bag_outlined,
-                    size: 32, color: AppColors.primary),
-              ),
-              const SizedBox(height: 18),
-              // Title
-              Text(
-                'Confirm Order?',
-                style: GoogleFonts.playfairDisplay(
-                  fontSize: 22,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.textDark,
+              ],
+            ),
+            padding: const EdgeInsets.all(28),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Icon
+                Container(
+                  width: 64,
+                  height: 64,
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withValues(alpha: 0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.shopping_bag_outlined,
+                    size: 32,
+                    color: AppColors.primary,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 10),
-              // Subtitle
-              Text(
-                'Are you sure you want to place this order?\nTotal: NRs. ${total.toStringAsFixed(0)}',
-                textAlign: TextAlign.center,
-                style: GoogleFonts.lato(
-                  fontSize: 13,
-                  color: AppColors.textMedium,
-                  height: 1.6,
+                const SizedBox(height: 18),
+                // Title
+                Text(
+                  'Confirm Order?',
+                  style: GoogleFonts.playfairDisplay(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.textDark,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 26),
-              // Buttons row
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: () => Navigator.pop(ctx),
-                      style: OutlinedButton.styleFrom(
-                        side: const BorderSide(
-                            color: AppColors.primary),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10)),
-                        padding:
-                            const EdgeInsets.symmetric(vertical: 14),
-                      ),
-                      child: Text(
-                        'Cancel',
-                        style: GoogleFonts.lato(
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.primary,
+                const SizedBox(height: 10),
+                // Subtitle
+                Text(
+                  'Are you sure you want to place this order?\nTotal: NRs. ${total.toStringAsFixed(0)}',
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.lato(
+                    fontSize: 13,
+                    color: AppColors.textMedium,
+                    height: 1.6,
+                  ),
+                ),
+                const SizedBox(height: 26),
+                // Buttons row
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: isSubmitting
+                            ? null
+                            : () => Navigator.pop(ctx),
+                        style: OutlinedButton.styleFrom(
+                          side: const BorderSide(color: AppColors.primary),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                        ),
+                        child: Text(
+                          'Cancel',
+                          style: GoogleFonts.lato(
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.primary,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.pop(ctx); // close dialog
-                        _placeOrder(context, ref, total);
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primary,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10)),
-                        elevation: 0,
-                        padding:
-                            const EdgeInsets.symmetric(vertical: 14),
-                      ),
-                      child: Text(
-                        'Yes, Order!',
-                        style: GoogleFonts.lato(
-                          fontWeight: FontWeight.w700,
-                          color: Colors.white,
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: isSubmitting
+                            ? null
+                            : () {
+                                // Guard against a rapid double-tap firing
+                                // this twice before the dialog closes.
+                                setDialogState(() => isSubmitting = true);
+                                Navigator.pop(ctx); // close dialog
+                                _placeOrder(context, ref, total);
+                              },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          elevation: 0,
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                        ),
+                        child: Text(
+                          'Yes, Order!',
+                          style: GoogleFonts.lato(
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-            ],
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  void _placeOrder(
-      BuildContext context, WidgetRef ref, double total) {
+  void _placeOrder(BuildContext context, WidgetRef ref, double total) {
     final checkoutState = ref.read(checkoutProvider);
 
     // Generate order ID
     final rand = Random();
-    final orderId =
-        '#FS-${(10000 + rand.nextInt(90000)).toString()}';
+    final orderId = '#FS-${(10000 + rand.nextInt(90000)).toString()}';
 
     // Map enum to display label
     final paymentLabel = switch (checkoutState.payment) {
-      PaymentMethod.esewa  => 'eSewa',
+      PaymentMethod.esewa => 'eSewa',
       PaymentMethod.khalti => 'Khalti',
-      PaymentMethod.card   => 'Card',
-      PaymentMethod.cod    => 'Cash on Delivery',
-      null                 => '',
+      PaymentMethod.card => 'Card',
+      PaymentMethod.cod => 'Cash on Delivery',
+      null => '',
     };
 
     // Clear cart then navigate
@@ -364,8 +376,7 @@ class _PhoneLayout extends ConsumerWidget {
         const SizedBox(height: 16),
         _PaymentCard(selected: state.payment),
         const SizedBox(height: 16),
-        _OrderSummaryCard(
-            total: orderTotal, deliveryFee: deliveryFee),
+        _OrderSummaryCard(total: orderTotal, deliveryFee: deliveryFee),
         const SizedBox(height: 16),
         _SecurityBanner(),
       ],
@@ -410,8 +421,7 @@ class _TabletLayout extends ConsumerWidget {
           flex: 2,
           child: Column(
             children: [
-              _OrderSummaryCard(
-                  total: orderTotal, deliveryFee: deliveryFee),
+              _OrderSummaryCard(total: orderTotal, deliveryFee: deliveryFee),
               const SizedBox(height: 16),
               _SecurityBanner(),
             ],
@@ -437,8 +447,11 @@ class _BackBtn extends StatelessWidget {
           color: AppColors.primary.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(10),
         ),
-        child: const Icon(Icons.arrow_back_ios_new_rounded,
-            size: 16, color: AppColors.primary),
+        child: const Icon(
+          Icons.arrow_back_ios_new_rounded,
+          size: 16,
+          color: AppColors.primary,
+        ),
       ),
     );
   }
@@ -447,8 +460,7 @@ class _BackBtn extends StatelessWidget {
 class _AddressField extends StatelessWidget {
   final TextEditingController controller;
   final WidgetRef ref;
-  const _AddressField(
-      {required this.controller, required this.ref});
+  const _AddressField({required this.controller, required this.ref});
 
   @override
   Widget build(BuildContext context) {
@@ -458,25 +470,31 @@ class _AddressField extends StatelessWidget {
         borderRadius: BorderRadius.circular(14),
         boxShadow: [
           BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
-              blurRadius: 10,
-              offset: const Offset(0, 2))
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
         ],
       ),
       child: TextField(
         controller: controller,
-        onChanged: (v) =>
-            ref.read(checkoutProvider.notifier).setAddress(v),
+        onChanged: (v) => ref.read(checkoutProvider.notifier).setAddress(v),
         style: GoogleFonts.lato(
-            fontSize: 14,
-            color: AppColors.textDark,
-            fontWeight: FontWeight.w500),
+          fontSize: 14,
+          color: AppColors.textDark,
+          fontWeight: FontWeight.w500,
+        ),
         decoration: InputDecoration(
           hintText: 'Delivery Address',
           hintStyle: GoogleFonts.lato(
-              fontSize: 14, color: AppColors.textMedium),
-          prefixIcon: const Icon(Icons.location_on_outlined,
-              color: AppColors.textMedium, size: 20),
+            fontSize: 14,
+            color: AppColors.textMedium,
+          ),
+          prefixIcon: const Icon(
+            Icons.location_on_outlined,
+            color: AppColors.textMedium,
+            size: 20,
+          ),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(14),
             borderSide: const BorderSide(color: Color(0xFFEEE8E0)),
@@ -487,11 +505,12 @@ class _AddressField extends StatelessWidget {
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(14),
-            borderSide:
-                const BorderSide(color: AppColors.primary, width: 1.5),
+            borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
           ),
           contentPadding: const EdgeInsets.symmetric(
-              horizontal: 14, vertical: 16),
+            horizontal: 14,
+            vertical: 16,
+          ),
           filled: true,
           fillColor: Colors.white,
         ),
@@ -513,19 +532,23 @@ class _DeliveryCard extends ConsumerWidget {
         borderRadius: BorderRadius.circular(14),
         boxShadow: [
           BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
-              blurRadius: 10,
-              offset: const Offset(0, 2))
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Delivery option',
-              style: GoogleFonts.lato(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w800,
-                  color: AppColors.textDark)),
+          Text(
+            'Delivery option',
+            style: GoogleFonts.lato(
+              fontSize: 15,
+              fontWeight: FontWeight.w800,
+              color: AppColors.textDark,
+            ),
+          ),
           const SizedBox(height: 14),
           _DeliveryTile(
             label: 'Standard delivery : 2-4 days',
@@ -569,8 +592,7 @@ class _DeliveryTile extends StatelessWidget {
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 180),
-        padding:
-            const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         decoration: BoxDecoration(
           color: isSelected
               ? AppColors.primary.withValues(alpha: 0.06)
@@ -591,8 +613,7 @@ class _DeliveryTile extends StatelessWidget {
               height: 20,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color:
-                    isSelected ? AppColors.primary : Colors.transparent,
+                color: isSelected ? AppColors.primary : Colors.transparent,
                 border: Border.all(
                   color: isSelected
                       ? AppColors.primary
@@ -601,27 +622,28 @@ class _DeliveryTile extends StatelessWidget {
                 ),
               ),
               child: isSelected
-                  ? const Icon(Icons.circle,
-                      size: 8, color: Colors.white)
+                  ? const Icon(Icons.circle, size: 8, color: Colors.white)
                   : null,
             ),
             const SizedBox(width: 12),
             Expanded(
-              child: Text(label,
-                  style: GoogleFonts.lato(
-                      fontSize: 13,
-                      fontWeight: isSelected
-                          ? FontWeight.w700
-                          : FontWeight.w500,
-                      color: AppColors.textDark)),
-            ),
-            Text(price,
+              child: Text(
+                label,
                 style: GoogleFonts.lato(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w700,
-                    color: isSelected
-                        ? AppColors.primary
-                        : AppColors.textDark)),
+                  fontSize: 13,
+                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                  color: AppColors.textDark,
+                ),
+              ),
+            ),
+            Text(
+              price,
+              style: GoogleFonts.lato(
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+                color: isSelected ? AppColors.primary : AppColors.textDark,
+              ),
+            ),
           ],
         ),
       ),
@@ -665,19 +687,23 @@ class _PaymentCard extends ConsumerWidget {
         borderRadius: BorderRadius.circular(14),
         boxShadow: [
           BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
-              blurRadius: 10,
-              offset: const Offset(0, 2))
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Payment method',
-              style: GoogleFonts.lato(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w800,
-                  color: AppColors.textDark)),
+          Text(
+            'Payment method',
+            style: GoogleFonts.lato(
+              fontSize: 15,
+              fontWeight: FontWeight.w800,
+              color: AppColors.textDark,
+            ),
+          ),
           const SizedBox(height: 14),
           GridView.count(
             crossAxisCount: 2,
@@ -689,9 +715,8 @@ class _PaymentCard extends ConsumerWidget {
             children: methods.map((m) {
               final isSel = selected == m.method;
               return GestureDetector(
-                onTap: () => ref
-                    .read(checkoutProvider.notifier)
-                    .setPayment(m.method),
+                onTap: () =>
+                    ref.read(checkoutProvider.notifier).setPayment(m.method),
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 180),
                   decoration: BoxDecoration(
@@ -712,21 +737,15 @@ class _PaymentCard extends ConsumerWidget {
                       Icon(
                         m.icon,
                         size: 18,
-                        color: isSel
-                            ? AppColors.primary
-                            : AppColors.textMedium,
+                        color: isSel ? AppColors.primary : AppColors.textMedium,
                       ),
                       const SizedBox(width: 8),
                       Text(
                         m.label,
                         style: GoogleFonts.lato(
                           fontSize: 13,
-                          fontWeight: isSel
-                              ? FontWeight.w700
-                              : FontWeight.w600,
-                          color: isSel
-                              ? AppColors.primary
-                              : AppColors.textDark,
+                          fontWeight: isSel ? FontWeight.w700 : FontWeight.w600,
+                          color: isSel ? AppColors.primary : AppColors.textDark,
                           height: 1.3,
                         ),
                       ),
@@ -746,17 +765,17 @@ class _PaymentMethodData {
   final PaymentMethod method;
   final String label;
   final IconData icon;
-  const _PaymentMethodData(
-      {required this.method,
-      required this.label,
-      required this.icon});
+  const _PaymentMethodData({
+    required this.method,
+    required this.label,
+    required this.icon,
+  });
 }
 
 class _OrderSummaryCard extends StatelessWidget {
   final double total;
   final double deliveryFee;
-  const _OrderSummaryCard(
-      {required this.total, required this.deliveryFee});
+  const _OrderSummaryCard({required this.total, required this.deliveryFee});
 
   @override
   Widget build(BuildContext context) {
@@ -768,33 +787,36 @@ class _OrderSummaryCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(14),
         boxShadow: [
           BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
-              blurRadius: 10,
-              offset: const Offset(0, 2))
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Order Summary',
-              style: GoogleFonts.lato(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w800,
-                  color: AppColors.textDark)),
+          Text(
+            'Order Summary',
+            style: GoogleFonts.lato(
+              fontSize: 15,
+              fontWeight: FontWeight.w800,
+              color: AppColors.textDark,
+            ),
+          ),
           const SizedBox(height: 14),
           _SummaryRow(
-              label: 'Subtotal',
-              value: 'NRs. ${subtotal.toStringAsFixed(0)}'),
+            label: 'Subtotal',
+            value: 'NRs. ${subtotal.toStringAsFixed(0)}',
+          ),
           const SizedBox(height: 8),
           _SummaryRow(
-              label: 'Delivery',
-              value: 'NRs. ${deliveryFee.toStringAsFixed(0)}'),
+            label: 'Delivery',
+            value: 'NRs. ${deliveryFee.toStringAsFixed(0)}',
+          ),
           const Padding(
             padding: EdgeInsets.symmetric(vertical: 12),
-            child: Divider(
-                height: 1,
-                thickness: 1,
-                color: Color(0xFFEEEEEE)),
+            child: Divider(height: 1, thickness: 1, color: Color(0xFFEEEEEE)),
           ),
           _SummaryRow(
             label: 'Total',
@@ -811,30 +833,33 @@ class _SummaryRow extends StatelessWidget {
   final String label;
   final String value;
   final bool bold;
-  const _SummaryRow(
-      {required this.label, required this.value, this.bold = false});
+  const _SummaryRow({
+    required this.label,
+    required this.value,
+    this.bold = false,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label,
-            style: GoogleFonts.lato(
-                fontSize: bold ? 15 : 13,
-                fontWeight:
-                    bold ? FontWeight.w800 : FontWeight.w500,
-                color: bold
-                    ? AppColors.textDark
-                    : AppColors.textMedium)),
-        Text(value,
-            style: GoogleFonts.lato(
-                fontSize: bold ? 15 : 13,
-                fontWeight:
-                    bold ? FontWeight.w800 : FontWeight.w600,
-                color: bold
-                    ? AppColors.primary
-                    : AppColors.textDark)),
+        Text(
+          label,
+          style: GoogleFonts.lato(
+            fontSize: bold ? 15 : 13,
+            fontWeight: bold ? FontWeight.w800 : FontWeight.w500,
+            color: bold ? AppColors.textDark : AppColors.textMedium,
+          ),
+        ),
+        Text(
+          value,
+          style: GoogleFonts.lato(
+            fontSize: bold ? 15 : 13,
+            fontWeight: bold ? FontWeight.w800 : FontWeight.w600,
+            color: bold ? AppColors.primary : AppColors.textDark,
+          ),
+        ),
       ],
     );
   }
@@ -844,18 +869,17 @@ class _SecurityBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding:
-          const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
         color: const Color(0xFFEAF7EE),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-            color: const Color(0xFF27AE60).withValues(alpha: 0.3)),
+          color: const Color(0xFF27AE60).withValues(alpha: 0.3),
+        ),
       ),
       child: Row(
         children: [
-          const Icon(Icons.shield_outlined,
-              size: 20, color: Color(0xFF27AE60)),
+          const Icon(Icons.shield_outlined, size: 20, color: Color(0xFF27AE60)),
           const SizedBox(width: 10),
           Expanded(
             child: Text(

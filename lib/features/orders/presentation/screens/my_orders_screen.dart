@@ -66,7 +66,13 @@ class _MyOrdersScreenState extends ConsumerState<MyOrdersScreen> {
                   Align(
                     alignment: Alignment.centerLeft,
                     child: GestureDetector(
-                      onTap: () => Navigator.of(context).maybePop(),
+                      onTap: () {
+                        if (context.canPop()) {
+                          context.pop();
+                        } else {
+                          context.go(AppRouter.home);
+                        }
+                      },
                       child: Container(
                         width: 36,
                         height: 36,

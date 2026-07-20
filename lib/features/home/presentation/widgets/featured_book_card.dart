@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pustakalaya/core/constants/app_colors.dart';
+import 'package:pustakalaya/core/router/app_router.dart';
+import 'package:pustakalaya/features/book_detail/presentation/providers/book_detail_provider.dart';
 import 'package:pustakalaya/features/home/domain/entities/book_entity.dart';
 import 'package:pustakalaya/features/wishlist/presentation/providers/wishlist_provider.dart';
 import 'package:pustakalaya/features/home/presentation/widgets/verified_badge.dart';
@@ -25,106 +28,118 @@ class FeaturedBookCard extends ConsumerWidget {
     final cardW = (screenW * 0.42).clamp(150.0, 185.0);
     final coverH = cardW * 1.28;
 
-    return Container(
-      width: cardW,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.07),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Book cover
-          ClipRRect(
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(14)),
-            child: Stack(
-              children: [
-                _BookCoverIllustration(
-                  book: book,
-                  color: _coverColor,
-                  height: coverH,
-                  width: cardW,
-                ),
-                // Heart button
-                Positioned(
-                  top: 8,
-                  right: 8,
-                  child: GestureDetector(
-                    onTap: () {
-                      ref.read(wishlistProvider.notifier).toggle(book);
-                    },
-                    child: Container(
-                      width: 30,
-                      height: 30,
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.9),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        isWishlisted
-                            ? Icons.favorite_rounded
-                            : Icons.favorite_border_rounded,
-                        size: 16,
-                        color: isWishlisted ? Colors.red : AppColors.textMedium,
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () {
+        ref.read(selectedBookProvider.notifier).state = book;
+        ref.read(bookQuantityProvider.notifier).state = 1;
+        context.push(AppRouter.bookDetail);
+      },
+      child: Container(
+        width: cardW,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(14),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.07),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Book cover
+            ClipRRect(
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(14),
+              ),
+              child: Stack(
+                children: [
+                  _BookCoverIllustration(
+                    book: book,
+                    color: _coverColor,
+                    height: coverH,
+                    width: cardW,
+                  ),
+                  // Heart button
+                  Positioned(
+                    top: 8,
+                    right: 8,
+                    child: GestureDetector(
+                      onTap: () {
+                        ref.read(wishlistProvider.notifier).toggle(book);
+                      },
+                      child: Container(
+                        width: 30,
+                        height: 30,
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.9),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          isWishlisted
+                              ? Icons.favorite_rounded
+                              : Icons.favorite_border_rounded,
+                          size: 16,
+                          color: isWishlisted
+                              ? Colors.red
+                              : AppColors.textMedium,
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ],
-            ),
-          ),
-
-          // Info section
-          Padding(
-            padding: const EdgeInsets.fromLTRB(10, 8, 10, 10),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (book.isVerified) ...[
-                  const VerifiedBadge(),
-                  const SizedBox(height: 4),
                 ],
-                Text(
-                  book.title,
-                  style: GoogleFonts.lato(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.textDark,
-                    height: 1.3,
-                  ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  book.author,
-                  style: GoogleFonts.lato(
-                    fontSize: 11,
-                    color: AppColors.textMedium,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  'NRs. ${book.price.toStringAsFixed(0)}',
-                  style: GoogleFonts.lato(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w800,
-                    color: AppColors.textDark,
-                  ),
-                ),
-              ],
+              ),
             ),
-          ),
-        ],
+
+            // Info section
+            Padding(
+              padding: const EdgeInsets.fromLTRB(10, 8, 10, 10),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (book.isVerified) ...[
+                    const VerifiedBadge(),
+                    const SizedBox(height: 4),
+                  ],
+                  Text(
+                    book.title,
+                    style: GoogleFonts.lato(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.textDark,
+                      height: 1.3,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    book.author,
+                    style: GoogleFonts.lato(
+                      fontSize: 11,
+                      color: AppColors.textMedium,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    'NRs. ${book.price.toStringAsFixed(0)}',
+                    style: GoogleFonts.lato(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w800,
+                      color: AppColors.textDark,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

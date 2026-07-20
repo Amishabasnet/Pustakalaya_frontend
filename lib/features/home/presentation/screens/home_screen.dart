@@ -22,9 +22,6 @@ class HomeScreen extends ConsumerWidget {
       backgroundColor: const Color(0xFFF7F3EF),
       body: RefreshIndicator(
         onRefresh: () async {
-          // Re-fetch home data from the backend — picks up anything changed
-          // in the admin panel (new/verified/featured books, stock, etc.)
-          // since this screen was first loaded.
           ref.invalidate(featuredBooksProvider);
           ref.invalidate(recentlyAddedProvider);
           ref.invalidate(genresProvider);
@@ -352,7 +349,7 @@ class HomeScreen extends ConsumerWidget {
   static double _heroFontSize(double w) => w > 600 ? 34 : 28;
   static double _featuredHeight(double w) {
     final cardW = (w * 0.42).clamp(150.0, 185.0);
-    return cardW * 1.28 + 92; // cover + info section
+    return cardW * 1.28 + 118;
   }
 }
 

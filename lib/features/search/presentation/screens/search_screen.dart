@@ -197,17 +197,22 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                         ),
                       ),
                       const SizedBox(width: 10),
-                      Container(
-                        width: 48,
-                        height: 48,
-                        decoration: BoxDecoration(
-                          color: AppColors.primary,
+                      Material(
+                        color: AppColors.primary,
+                        borderRadius: BorderRadius.circular(12),
+                        child: InkWell(
                           borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: const Icon(
-                          Icons.tune_rounded,
-                          color: Colors.white,
-                          size: 20,
+                          onTap: () => context.push(AppRouter.filter),
+                          child: Container(
+                            width: 48,
+                            height: 48,
+                            alignment: Alignment.center,
+                            child: const Icon(
+                              Icons.tune_rounded,
+                              color: Colors.white,
+                              size: 20,
+                            ),
+                          ),
                         ),
                       ),
                     ],
@@ -278,7 +283,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                       onQueryTap: _onSearch,
                       hasMore: resultsState.hasMore,
                       isLoadingMore: resultsState.isLoadingMore,
-                      onLoadMore: () => ref.read(searchResultsProvider.notifier).loadMore(),
+                      onLoadMore: () =>
+                          ref.read(searchResultsProvider.notifier).loadMore(),
                     )
                   : hasSectionFilter
                   ? _SectionView(

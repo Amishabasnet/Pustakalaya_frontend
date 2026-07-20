@@ -5,17 +5,24 @@ import 'package:go_router/go_router.dart';
 import 'package:pustakalaya/core/constants/app_colors.dart';
 import 'package:pustakalaya/core/router/app_router.dart';
 
-
 class ConfirmationScreen extends StatelessWidget {
   final String orderId;
   final double total;
   final String paymentMethod;
+  final String bookTitle;
+  final String bookAuthor;
+  final String bookColor;
+  final String placedDate;
 
   const ConfirmationScreen({
     super.key,
     required this.orderId,
     required this.total,
     required this.paymentMethod,
+    this.bookTitle = 'Your Order',
+    this.bookAuthor = '',
+    this.bookColor = '#E8602C',
+    this.placedDate = '',
   });
 
   @override
@@ -31,13 +38,10 @@ class ConfirmationScreen extends StatelessWidget {
           children: [
             Container(
               color: Colors.white,
-              padding:
-                  EdgeInsets.symmetric(horizontal: hPad, vertical: 14),
+              padding: EdgeInsets.symmetric(horizontal: hPad, vertical: 14),
               child: Row(
                 children: [
-                  _BackBtn(
-                    onTap: () => context.go(AppRouter.home),
-                  ),
+                  _BackBtn(onTap: () => context.go(AppRouter.home)),
                   Expanded(
                     child: Text(
                       'Confirmation',
@@ -96,13 +100,12 @@ class ConfirmationScreen extends StatelessWidget {
                       width: double.infinity,
                       height: 52,
                       child: ElevatedButton(
-                        onPressed: () =>
-                            _onTrackOrder(context),
+                        onPressed: () => _onTrackOrder(context),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.primary,
                           shape: RoundedRectangleBorder(
-                              borderRadius:
-                                  BorderRadius.circular(12)),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
                           elevation: 0,
                         ),
                         child: Text(
@@ -122,14 +125,15 @@ class ConfirmationScreen extends StatelessWidget {
                       width: double.infinity,
                       height: 52,
                       child: OutlinedButton(
-                        onPressed: () =>
-                            _showCancelDialog(context),
+                        onPressed: () => _showCancelDialog(context),
                         style: OutlinedButton.styleFrom(
                           side: const BorderSide(
-                              color: Color(0xFFDDD8D2), width: 1.5),
+                            color: Color(0xFFDDD8D2),
+                            width: 1.5,
+                          ),
                           shape: RoundedRectangleBorder(
-                              borderRadius:
-                                  BorderRadius.circular(12)),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
                         ),
                         child: Text(
                           'CANCEL ORDER',
@@ -153,7 +157,18 @@ class ConfirmationScreen extends StatelessWidget {
   }
 
   void _onTrackOrder(BuildContext context) {
-    context.go(AppRouter.myOrders);
+    context.push(
+      AppRouter.trackOrder,
+      extra: {
+        'orderId': orderId,
+        'total': total,
+        'paymentMethod': paymentMethod,
+        'bookTitle': bookTitle,
+        'bookAuthor': bookAuthor,
+        'bookColor': bookColor,
+        'placedDate': placedDate,
+      },
+    );
   }
 
   void _showCancelDialog(BuildContext context) {
@@ -162,17 +177,17 @@ class ConfirmationScreen extends StatelessWidget {
       barrierDismissible: true,
       builder: (ctx) => Dialog(
         backgroundColor: Colors.transparent,
-        insetPadding:
-            const EdgeInsets.symmetric(horizontal: 28, vertical: 24),
+        insetPadding: const EdgeInsets.symmetric(horizontal: 28, vertical: 24),
         child: Container(
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.12),
-                  blurRadius: 24,
-                  offset: const Offset(0, 8))
+                color: Colors.black.withValues(alpha: 0.12),
+                blurRadius: 24,
+                offset: const Offset(0, 8),
+              ),
             ],
           ),
           padding: const EdgeInsets.all(28),
@@ -186,8 +201,11 @@ class ConfirmationScreen extends StatelessWidget {
                   color: Colors.red.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.cancel_outlined,
-                    size: 32, color: Colors.red),
+                child: const Icon(
+                  Icons.cancel_outlined,
+                  size: 32,
+                  color: Colors.red,
+                ),
               ),
               const SizedBox(height: 18),
               Text(
@@ -215,18 +233,19 @@ class ConfirmationScreen extends StatelessWidget {
                     child: OutlinedButton(
                       onPressed: () => Navigator.pop(ctx),
                       style: OutlinedButton.styleFrom(
-                        side: const BorderSide(
-                            color: AppColors.primary),
+                        side: const BorderSide(color: AppColors.primary),
                         shape: RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.circular(10)),
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 14),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 14),
                       ),
-                      child: Text('Keep Order',
-                          style: GoogleFonts.lato(
-                              fontWeight: FontWeight.w700,
-                              color: AppColors.primary)),
+                      child: Text(
+                        'Keep Order',
+                        style: GoogleFonts.lato(
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.primary,
+                        ),
+                      ),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -239,16 +258,18 @@ class ConfirmationScreen extends StatelessWidget {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.red,
                         shape: RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.circular(10)),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
                         elevation: 0,
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 14),
+                        padding: const EdgeInsets.symmetric(vertical: 14),
                       ),
-                      child: Text('Yes, Cancel',
-                          style: GoogleFonts.lato(
-                              fontWeight: FontWeight.w700,
-                              color: Colors.white)),
+                      child: Text(
+                        'Yes, Cancel',
+                        style: GoogleFonts.lato(
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                        ),
+                      ),
                     ),
                   ),
                 ],
@@ -276,15 +297,17 @@ class _AnimatedCheckmarkState extends State<_AnimatedCheckmark>
   void initState() {
     super.initState();
     _ctrl = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 600));
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    );
 
-    _scale = CurvedAnimation(
-        parent: _ctrl, curve: Curves.elasticOut);
+    _scale = CurvedAnimation(parent: _ctrl, curve: Curves.elasticOut);
 
     _opacity = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
-          parent: _ctrl,
-          curve: const Interval(0.0, 0.4, curve: Curves.easeIn)),
+        parent: _ctrl,
+        curve: const Interval(0.0, 0.4, curve: Curves.easeIn),
+      ),
     );
 
     // Haptic + animation together
@@ -360,22 +383,11 @@ class _OrderDetailsCard extends StatelessWidget {
       ),
       child: Column(
         children: [
-          _DetailRow(
-            label: 'Order ID',
-            value: orderId,
-            isFirst: true,
-          ),
+          _DetailRow(label: 'Order ID', value: orderId, isFirst: true),
           _Divider(),
-          _DetailRow(
-            label: 'Total',
-            value: 'NRs. ${total.toStringAsFixed(0)}',
-          ),
+          _DetailRow(label: 'Total', value: 'NRs. ${total.toStringAsFixed(0)}'),
           _Divider(),
-          _DetailRow(
-            label: 'Payment',
-            value: paymentMethod,
-            isLast: true,
-          ),
+          _DetailRow(label: 'Payment', value: paymentMethod, isLast: true),
         ],
       ),
     );
@@ -435,10 +447,15 @@ class _Divider extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const Divider(
-        height: 1, thickness: 1, color: Color(0xFFF0EBE6),
-        indent: 20, endIndent: 20);
+      height: 1,
+      thickness: 1,
+      color: Color(0xFFF0EBE6),
+      indent: 20,
+      endIndent: 20,
+    );
   }
 }
+
 class _BackBtn extends StatelessWidget {
   final VoidCallback onTap;
   const _BackBtn({required this.onTap});
@@ -454,8 +471,11 @@ class _BackBtn extends StatelessWidget {
           color: AppColors.primary.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(10),
         ),
-        child: const Icon(Icons.arrow_back_ios_new_rounded,
-            size: 16, color: AppColors.primary),
+        child: const Icon(
+          Icons.arrow_back_ios_new_rounded,
+          size: 16,
+          color: AppColors.primary,
+        ),
       ),
     );
   }
