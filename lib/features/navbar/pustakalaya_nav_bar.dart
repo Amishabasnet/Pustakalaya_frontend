@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/constants/app_colors.dart';
+import '../cart/presentation/providers/cart_provider.dart';
 
-class PustakalayaNavBar extends StatelessWidget {
+class PustakalayaNavBar extends ConsumerWidget {
   final int currentIndex;
   final ValueChanged<int> onTap;
 
@@ -35,8 +37,12 @@ class PustakalayaNavBar extends StatelessWidget {
     ),
   ];
 
+  static const int _cartTabIndex = 2;
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final cartCount = ref.watch(cartItemCountProvider);
+
     return Container(
       decoration: const BoxDecoration(
         color: AppColors.primary,
@@ -56,6 +62,7 @@ class PustakalayaNavBar extends StatelessWidget {
             children: List.generate(_items.length, (i) {
               final item = _items[i];
               final selected = i == currentIndex;
+              final showBadge = i == _cartTabIndex && cartCount > 0;
               return Expanded(
                 child: GestureDetector(
                   behavior: HitTestBehavior.opaque,
@@ -63,15 +70,31 @@ class PustakalayaNavBar extends StatelessWidget {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      AnimatedSwitcher(
-                        duration: const Duration(milliseconds: 200),
-                        child: Icon(
-                          selected ? item.activeIcon : item.inactiveIcon,
-                          key: ValueKey(selected),
-                          size: 26,
-                          color: Colors.white.withValues(
-                            alpha: selected ? 1.0 : 0.65,
-                          ),
+                      SizedBox(
+                        width: 32,
+                        height: 26,
+                        child: Stack(
+                          clipBehavior: Clip.none,
+                          alignment: Alignment.center,
+                          children: [
+                            AnimatedSwitcher(
+                              duration: const Duration(milliseconds: 200),
+                              child: Icon(
+                                selected ? item.activeIcon : item.inactiveIcon,
+                                key: ValueKey(selected),
+                                size: 26,
+                                color: Colors.white.withValues(
+                                  alpha: selected ? 1.0 : 0.65,
+                                ),
+                              ),
+                            ),
+                            if (showBadge)
+                              Positioned(
+                                top: -4,
+                                right: -2,
+                                child: _CartBadge(count: cartCount),
+                              ),
+                          ],
                         ),
                       ),
                       const SizedBox(height: 3),
@@ -93,6 +116,36 @@ class PustakalayaNavBar extends StatelessWidget {
               );
             }),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _CartBadge extends StatelessWidget {
+  final int count;
+  const _CartBadge({required this.count});
+
+  @override
+  Widget build(BuildContext context) {
+    final label = count > 9 ? '9+' : '$count';
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 4),
+      constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
+      decoration: BoxDecoration(
+        color: Colors.red,
+        shape: count > 9 ? BoxShape.rectangle : BoxShape.circle,
+        borderRadius: count > 9 ? BorderRadius.circular(8) : null,
+        border: Border.all(color: AppColors.primary, width: 1.5),
+      ),
+      alignment: Alignment.center,
+      child: Text(
+        label,
+        style: GoogleFonts.lato(
+          fontSize: 9,
+          fontWeight: FontWeight.w800,
+          color: Colors.white,
+          height: 1.2,
         ),
       ),
     );

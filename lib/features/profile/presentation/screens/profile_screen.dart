@@ -152,7 +152,7 @@ class ProfileScreen extends ConsumerWidget {
                         icon: Icons.shopping_bag_outlined,
                         label: 'My Orders',
                         badge: '${profile.totalOrders}',
-                        onTap: () => context.go(AppRouter.myOrders),
+                        onTap: () => context.push(AppRouter.myOrders),
                       ),
                       _MenuItem(
                         icon: Icons.replay_outlined,

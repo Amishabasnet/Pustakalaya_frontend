@@ -56,10 +56,28 @@ class OrdersListState {
 class OrdersListNotifier extends StateNotifier<OrdersListState> {
   final OrdersRepository _repo;
   final String? _statusFilter;
+  final int _tab;
 
-  OrdersListNotifier(this._repo, this._statusFilter)
+  OrdersListNotifier(this._repo, this._statusFilter, this._tab)
     : super(const OrdersListState()) {
     loadMore();
+  }
+
+  /// Belt-and-suspenders check: even though the server is asked to filter
+  /// by status, an order should never appear under "Delivered" (or
+  /// "Processing") unless its real status matches that tab. This protects
+  /// against orders showing up early if the backend's statusFilter is ever
+  /// missed/loose — an order only ever shows as delivered once an admin has
+  /// actually set its status to "delivered".
+  bool _matchesTab(OrderItem order) {
+    switch (_tab) {
+      case 1:
+        return order.status.isProcessing;
+      case 2:
+        return order.status.isDelivered;
+      default:
+        return true;
+    }
   }
 
   Future<void> loadMore() async {
@@ -73,8 +91,9 @@ class OrdersListNotifier extends StateNotifier<OrdersListState> {
         limit: _pageSize,
         statusFilter: _statusFilter,
       );
+      final filtered = result.orders.where(_matchesTab).toList();
       state = state.copyWith(
-        orders: [...state.orders, ...result.orders],
+        orders: [...state.orders, ...filtered],
         page: result.page,
         hasMore: result.hasMore,
         isLoadingMore: false,
@@ -95,6 +114,7 @@ final ordersListProvider = StateNotifierProvider.autoDispose
       return OrdersListNotifier(
         ref.watch(ordersRepositoryProvider),
         _statusFilterFor(tab),
+        tab,
       );
     });
 
