@@ -1,12 +1,17 @@
-import 'dart:math';
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pustakalaya/core/constants/app_colors.dart';
+import 'package:pustakalaya/core/network/api_exception.dart';
 import 'package:pustakalaya/core/router/app_router.dart';
 import 'package:pustakalaya/features/cart/presentation/providers/cart_provider.dart';
+import 'package:pustakalaya/features/orders/domain/repositories/orders_repository.dart'
+    as orders_repo;
+import 'package:pustakalaya/features/orders/presentation/providers/orders_provider.dart';
+import 'package:pustakalaya/features/profile/presentation/providers/profile_provider.dart';
 
 enum DeliveryOption { standard, express }
 
@@ -48,8 +53,7 @@ final checkoutProvider =
     );
 
 class CheckoutScreen extends ConsumerStatefulWidget {
-  final double grandTotal;
-  const CheckoutScreen({super.key, required this.grandTotal});
+  const CheckoutScreen({super.key});
 
   @override
   ConsumerState<CheckoutScreen> createState() => _CheckoutScreenState();
@@ -72,12 +76,16 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
     final hPad = screenW > 600 ? 40.0 : 20.0;
     final isTablet = screenW > 600;
 
+    // Subtotal always comes straight from the cart (sum of each item's
+    // price * quantity), so it reflects whatever books are actually in
+    // the cart rather than a value guessed from navigation params.
+    final cartSubtotal = ref.watch(cartTotalProvider);
+
     // Delivery fee
     final deliveryFee = state.delivery == DeliveryOption.standard
         ? 120.0
         : 200.0;
-    final cartTotal = widget.grandTotal - 120.0; // strip old standard fee
-    final orderTotal = cartTotal + deliveryFee;
+    final orderTotal = cartSubtotal + deliveryFee;
 
     return Scaffold(
       backgroundColor: const Color(0xFFFAF0EA),
@@ -163,6 +171,11 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
   void _onConfirmPressed(BuildContext context, WidgetRef ref, double total) {
     final state = ref.read(checkoutProvider);
 
+    // Guard: cart must have items
+    if (ref.read(cartProvider).isEmpty) {
+      _showSnack(context, 'Your cart is empty');
+      return;
+    }
     // Guard: address required
     if (state.address.trim().isEmpty) {
       _showSnack(context, 'Please enter your delivery address');
@@ -259,61 +272,75 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                   ),
                 ),
                 const SizedBox(height: 26),
-                // Buttons row
-                Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: isSubmitting
-                            ? null
-                            : () => Navigator.pop(ctx),
-                        style: OutlinedButton.styleFrom(
-                          side: const BorderSide(color: AppColors.primary),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
+                // Buttons row (or spinner while the order is being placed)
+                if (isSubmitting)
+                  const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 6),
+                    child: CircularProgressIndicator(
+                      color: AppColors.primary,
+                      strokeWidth: 3,
+                    ),
+                  )
+                else
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton(
+                          onPressed: () => Navigator.pop(ctx),
+                          style: OutlinedButton.styleFrom(
+                            side: const BorderSide(color: AppColors.primary),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            padding: const EdgeInsets.symmetric(vertical: 14),
                           ),
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                        ),
-                        child: Text(
-                          'Cancel',
-                          style: GoogleFonts.lato(
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.primary,
+                          child: Text(
+                            'Cancel',
+                            style: GoogleFonts.lato(
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.primary,
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: isSubmitting
-                            ? null
-                            : () {
-                                // Guard against a rapid double-tap firing
-                                // this twice before the dialog closes.
-                                setDialogState(() => isSubmitting = true);
-                                Navigator.pop(ctx); // close dialog
-                                _placeOrder(context, ref, total);
-                              },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primary,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: () async {
+                            setDialogState(() => isSubmitting = true);
+                            final success = await _placeOrder(
+                              context,
+                              ref,
+                              total,
+                            );
+                            // On success _placeOrder already navigated away
+                            // (which disposes this dialog's route along with
+                            // it); on failure we close the dialog so the
+                            // error snackbar is visible on the checkout
+                            // screen behind it.
+                            if (!success && ctx.mounted) {
+                              Navigator.pop(ctx);
+                            }
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.primary,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            elevation: 0,
+                            padding: const EdgeInsets.symmetric(vertical: 14),
                           ),
-                          elevation: 0,
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                        ),
-                        child: Text(
-                          'Yes, Order!',
-                          style: GoogleFonts.lato(
-                            fontWeight: FontWeight.w700,
-                            color: Colors.white,
+                          child: Text(
+                            'Yes, Order!',
+                            style: GoogleFonts.lato(
+                              fontWeight: FontWeight.w700,
+                              color: Colors.white,
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
+                    ],
+                  ),
               ],
             ),
           ),
@@ -322,33 +349,81 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
     );
   }
 
-  void _placeOrder(BuildContext context, WidgetRef ref, double total) {
+  /// Places the order for real via `POST /checkout/place-order`, so it
+  /// actually gets saved server-side and shows up on "My Orders".
+  /// Returns true on success, false if it failed (caller keeps the user on
+  /// the checkout screen and shows why).
+  Future<bool> _placeOrder(
+    BuildContext context,
+    WidgetRef ref,
+    double total,
+  ) async {
     final checkoutState = ref.read(checkoutProvider);
+    final profile = ref.read(profileProvider);
 
-    // Generate order ID
-    final rand = Random();
-    final orderId = '#FS-${(10000 + rand.nextInt(90000)).toString()}';
+    // The checkout screen only collects a single free-text address line,
+    // but the backend wants it split into street/city. Split on the last
+    // comma ("123 Main St, Kathmandu" -> street / city); if there's no
+    // comma, fall back to using the whole line for both so the required
+    // fields are never empty.
+    final rawAddress = checkoutState.address.trim();
+    final commaIdx = rawAddress.lastIndexOf(',');
+    final street = commaIdx == -1
+        ? rawAddress
+        : rawAddress.substring(0, commaIdx).trim();
+    final city = commaIdx == -1
+        ? rawAddress
+        : rawAddress.substring(commaIdx + 1).trim();
 
-    // Map enum to display label
-    final paymentLabel = switch (checkoutState.payment) {
-      PaymentMethod.esewa => 'eSewa',
-      PaymentMethod.khalti => 'Khalti',
-      PaymentMethod.card => 'Card',
-      PaymentMethod.cod => 'Cash on Delivery',
-      null => '',
-    };
+    try {
+      final placed = await ref
+          .read(ordersRepositoryProvider)
+          .placeOrder(
+            deliveryAddress: orders_repo.DeliveryAddress(
+              fullName: profile.name,
+              phone: profile.phoneNumber,
+              street: street.isEmpty ? city : street,
+              city: city.isEmpty ? street : city,
+            ),
+            deliveryOption: checkoutState.delivery.name,
+            paymentMethod: checkoutState.payment!.name,
+          );
 
-    // Clear cart then navigate
-    ref.read(cartProvider.notifier).clear();
+      // Cart is now checked out — clear it, and refresh every orders tab
+      // (all/processing/delivered) so the new order shows up immediately
+      // without needing an app restart.
+      ref.read(cartProvider.notifier).clear();
+      for (var tab = 0; tab < 3; tab++) {
+        ref.invalidate(ordersListProvider(tab));
+      }
+      // The Profile screen's "Orders" stat and the "My Orders" badge both
+      // come from profileProvider's cached totalOrders, which — like the
+      // orders list — is only fetched once and otherwise never refetches.
+      // Without this it'd keep showing the pre-order count (e.g. "0")
+      // until the app restarted.
+      unawaited(ref.read(profileProvider.notifier).refresh());
 
-    context.go(
-      AppRouter.confirmation,
-      extra: {
-        'orderId': orderId,
-        'total': total,
-        'paymentMethod': paymentLabel,
-      },
-    );
+      if (!context.mounted) return true;
+      context.go(
+        AppRouter.confirmation,
+        extra: {
+          'orderId': placed.orderId,
+          'total': placed.total,
+          'paymentMethod': placed.paymentMethod,
+        },
+      );
+      return true;
+    } on ApiException catch (e) {
+      if (context.mounted) {
+        _showSnack(
+          context,
+          e.message.isNotEmpty
+              ? e.message
+              : "Couldn't place your order. Please try again.",
+        );
+      }
+      return false;
+    }
   }
 }
 

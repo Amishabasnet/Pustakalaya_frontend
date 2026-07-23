@@ -6,6 +6,8 @@ import 'package:pustakalaya/core/constants/app_colors.dart';
 import 'package:pustakalaya/core/router/app_router.dart';
 import 'package:pustakalaya/features/profile/presentation/providers/profile_provider.dart';
 import 'package:pustakalaya/features/auth/presentation/providers/auth_provider.dart';
+import 'package:pustakalaya/features/cart/presentation/providers/cart_provider.dart';
+import 'package:pustakalaya/features/wishlist/presentation/providers/wishlist_provider.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
@@ -227,6 +229,9 @@ class ProfileScreen extends ConsumerWidget {
                     child: OutlinedButton.icon(
                       onPressed: () async {
                         await ref.read(authRepositoryProvider).signOut();
+                        ref.invalidate(profileProvider);
+                        ref.invalidate(wishlistProvider);
+                        ref.invalidate(cartProvider);
                         if (context.mounted) context.go(AppRouter.signIn);
                       },
                       icon: const Icon(

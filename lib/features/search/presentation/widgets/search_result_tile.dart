@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pustakalaya/core/constants/app_colors.dart';
+import 'package:pustakalaya/core/widgets/book_cover_image.dart';
 import 'package:pustakalaya/features/home/domain/entities/book_entity.dart';
 
 class SearchResultTile extends StatelessWidget {
@@ -80,37 +81,45 @@ class SearchResultTile extends StatelessWidget {
             // Mini cover
             ClipRRect(
               borderRadius: BorderRadius.circular(8),
-              child: Container(
+              child: SizedBox(
                 width: 48,
                 height: 62,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      _coverColor,
-                      Color.lerp(_coverColor, Colors.black, 0.28)!,
-                    ],
-                  ),
-                ),
-                child: Stack(
-                  children: [
-                    Container(width: 5, color: Colors.black.withValues(alpha: 0.2)),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(8, 7, 5, 7),
-                      child: Text(
-                        book.title,
-                        style: GoogleFonts.lato(
-                          fontSize: 6.5,
-                          fontWeight: FontWeight.w800,
-                          color: textOnCover,
-                          height: 1.25,
-                        ),
-                        maxLines: 5,
-                        overflow: TextOverflow.ellipsis,
+                child: BookCoverImage(
+                  imageUrl: book.coverImageUrl,
+                  illustration: Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          _coverColor,
+                          Color.lerp(_coverColor, Colors.black, 0.28)!,
+                        ],
                       ),
                     ),
-                  ],
+                    child: Stack(
+                      children: [
+                        Container(
+                          width: 5,
+                          color: Colors.black.withValues(alpha: 0.2),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(8, 7, 5, 7),
+                          child: Text(
+                            book.title,
+                            style: GoogleFonts.lato(
+                              fontSize: 6.5,
+                              fontWeight: FontWeight.w800,
+                              color: textOnCover,
+                              height: 1.25,
+                            ),
+                            maxLines: 5,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
             ),

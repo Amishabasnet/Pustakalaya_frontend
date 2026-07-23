@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pustakalaya/core/constants/app_colors.dart';
+import 'package:pustakalaya/core/widgets/book_cover_image.dart';
 import 'package:pustakalaya/features/wishlist/domain/entities/wishlist_item.dart';
 import 'package:pustakalaya/features/wishlist/presentation/providers/wishlist_provider.dart';
 import 'package:pustakalaya/features/wishlist/presentation/widgets/star_rating_row.dart';
-
 
 class WishlistBookCard extends ConsumerWidget {
   final WishlistItem item;
@@ -44,11 +44,11 @@ class WishlistBookCard extends ConsumerWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            // Book cover 
+            // Book cover
             _BookCover(color: _coverColor, isDark: _isDark, item: item),
             const SizedBox(width: 14),
 
-            // Info 
+            // Info
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -96,11 +96,10 @@ class WishlistBookCard extends ConsumerWidget {
               ),
             ),
 
-            // Heart button 
+            // Heart button
             GestureDetector(
-              onTap: () => ref
-                  .read(wishlistProvider.notifier)
-                  .remove(item.book.id),
+              onTap: () =>
+                  ref.read(wishlistProvider.notifier).remove(item.book.id),
               child: Container(
                 width: 38,
                 height: 38,
@@ -140,72 +139,81 @@ class _BookCover extends StatelessWidget {
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(10),
-      child: Container(
+      child: SizedBox(
         width: 72,
         height: 96,
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              color,
-              Color.lerp(color, isDark ? Colors.black : Colors.white, 0.28)!,
-            ],
-          ),
-        ),
-        child: Stack(
-          children: [
-            // Spine
-            Container(
-              width: 6,
-              color: Colors.black.withValues(alpha: 0.18),
-            ),
-            // Decorative circle
-            Positioned(
-              top: -12,
-              right: -12,
-              child: Container(
-                width: 52,
-                height: 52,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.white.withValues(alpha: 0.08),
-                ),
-              ),
-            ),
-            // Title text on cover
-            Padding(
-              padding: const EdgeInsets.fromLTRB(10, 10, 6, 8),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    item.book.title,
-                    style: GoogleFonts.lato(
-                      fontSize: 8,
-                      fontWeight: FontWeight.w900,
-                      color: textColor,
-                      height: 1.25,
-                      letterSpacing: 0.2,
-                    ),
-                    maxLines: 5,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const Spacer(),
-                  Text(
-                    item.book.author,
-                    style: GoogleFonts.lato(
-                      fontSize: 7,
-                      color: textColor.withValues(alpha: 0.75),
-                      fontWeight: FontWeight.w500,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
+        child: BookCoverImage(
+          imageUrl: item.book.coverImageUrl,
+          illustration: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  color,
+                  Color.lerp(
+                    color,
+                    isDark ? Colors.black : Colors.white,
+                    0.28,
+                  )!,
                 ],
               ),
             ),
-          ],
+            child: Stack(
+              children: [
+                // Spine
+                Container(
+                  width: 6,
+                  color: Colors.black.withValues(alpha: 0.18),
+                ),
+                // Decorative circle
+                Positioned(
+                  top: -12,
+                  right: -12,
+                  child: Container(
+                    width: 52,
+                    height: 52,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.white.withValues(alpha: 0.08),
+                    ),
+                  ),
+                ),
+                // Title text on cover
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(10, 10, 6, 8),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        item.book.title,
+                        style: GoogleFonts.lato(
+                          fontSize: 8,
+                          fontWeight: FontWeight.w900,
+                          color: textColor,
+                          height: 1.25,
+                          letterSpacing: 0.2,
+                        ),
+                        maxLines: 5,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const Spacer(),
+                      Text(
+                        item.book.author,
+                        style: GoogleFonts.lato(
+                          fontSize: 7,
+                          color: textColor.withValues(alpha: 0.75),
+                          fontWeight: FontWeight.w500,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );

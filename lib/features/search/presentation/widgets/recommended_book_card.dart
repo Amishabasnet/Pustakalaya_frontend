@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pustakalaya/core/constants/app_colors.dart';
+import 'package:pustakalaya/core/widgets/book_cover_image.dart';
 import 'package:pustakalaya/features/home/domain/entities/book_entity.dart';
 
 class RecommendedBookCard extends ConsumerWidget {
@@ -38,89 +39,97 @@ class RecommendedBookCard extends ConsumerWidget {
         children: [
           ClipRRect(
             borderRadius: BorderRadius.circular(10),
-            child: Container(
+            child: SizedBox(
               width: cardW,
               height: coverH,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    Color.lerp(_coverColor, Colors.white, 0.15)!,
-                    _coverColor,
-                    Color.lerp(_coverColor, Colors.black, 0.25)!,
-                  ],
-                ),
-              ),
-              child: Stack(
-                children: [
-                  // Spine
-                  Container(width: 8, color: Colors.black.withValues(alpha: 0.18)),
-                  // Decor circles
-                  Positioned(
-                    top: -24,
-                    right: -24,
-                    child: Container(
-                      width: 90,
-                      height: 90,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.white.withValues(alpha: 0.08),
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    bottom: -16,
-                    left: -16,
-                    child: Container(
-                      width: 70,
-                      height: 70,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.white.withValues(alpha: 0.06),
-                      ),
-                    ),
-                  ),
-                  // Title on cover
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(14, 16, 10, 12),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          book.title.toUpperCase(),
-                          style: GoogleFonts.playfairDisplay(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w900,
-                            color: textOnCover,
-                            height: 1.2,
-                            letterSpacing: 0.3,
-                          ),
-                          maxLines: 5,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const SizedBox(height: 8),
-                        Container(
-                          height: 1.5,
-                          width: 28,
-                          color: textOnCover.withValues(alpha: 0.4),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          book.author,
-                          style: GoogleFonts.lato(
-                            fontSize: 10,
-                            color: textOnCover.withValues(alpha: 0.8),
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: 0.3,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
+              child: BookCoverImage(
+                imageUrl: book.coverImageUrl,
+                illustration: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        Color.lerp(_coverColor, Colors.white, 0.15)!,
+                        _coverColor,
+                        Color.lerp(_coverColor, Colors.black, 0.25)!,
                       ],
                     ),
                   ),
-                ],
+                  child: Stack(
+                    children: [
+                      // Spine
+                      Container(
+                        width: 8,
+                        color: Colors.black.withValues(alpha: 0.18),
+                      ),
+                      // Decor circles
+                      Positioned(
+                        top: -24,
+                        right: -24,
+                        child: Container(
+                          width: 90,
+                          height: 90,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.white.withValues(alpha: 0.08),
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        bottom: -16,
+                        left: -16,
+                        child: Container(
+                          width: 70,
+                          height: 70,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.white.withValues(alpha: 0.06),
+                          ),
+                        ),
+                      ),
+                      // Title on cover
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(14, 16, 10, 12),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              book.title.toUpperCase(),
+                              style: GoogleFonts.playfairDisplay(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w900,
+                                color: textOnCover,
+                                height: 1.2,
+                                letterSpacing: 0.3,
+                              ),
+                              maxLines: 5,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            const SizedBox(height: 8),
+                            Container(
+                              height: 1.5,
+                              width: 28,
+                              color: textOnCover.withValues(alpha: 0.4),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              book.author,
+                              style: GoogleFonts.lato(
+                                fontSize: 10,
+                                color: textOnCover.withValues(alpha: 0.8),
+                                fontWeight: FontWeight.w600,
+                                letterSpacing: 0.3,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ),
           ),

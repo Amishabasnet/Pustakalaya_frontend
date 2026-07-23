@@ -6,6 +6,9 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:pustakalaya/core/constants/app_colors.dart';
 import 'package:pustakalaya/core/router/app_router.dart';
 import 'package:pustakalaya/features/auth/presentation/providers/auth_provider.dart';
+import 'package:pustakalaya/features/cart/presentation/providers/cart_provider.dart';
+import 'package:pustakalaya/features/profile/presentation/providers/profile_provider.dart';
+import 'package:pustakalaya/features/wishlist/presentation/providers/wishlist_provider.dart';
 import 'package:pustakalaya/features/auth/presentation/widgets/auth_primary_button.dart';
 import 'package:pustakalaya/features/auth/presentation/widgets/auth_text_field.dart';
 
@@ -43,6 +46,13 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
     ref.listen(signInNotifierProvider, (prev, next) {
       if (next.isSuccess) {
         if (!mounted) return;
+        // These providers are created once and cache their data for the
+        // whole app session, so without this a freshly logged-in account
+        // would keep showing the *previous* user's profile/wishlist/cart
+        // until the app was restarted.
+        ref.invalidate(profileProvider);
+        ref.invalidate(wishlistProvider);
+        ref.invalidate(cartProvider);
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Welcome back! 📚'),

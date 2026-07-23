@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pustakalaya/core/constants/app_colors.dart';
+import 'package:pustakalaya/core/widgets/book_cover_image.dart';
 import 'package:pustakalaya/core/network/api_exception.dart';
 import 'package:pustakalaya/features/book_detail/presentation/providers/book_detail_provider.dart';
 import 'package:pustakalaya/features/book_detail/presentation/widgets/accordion_section.dart';
@@ -72,77 +73,82 @@ class BookDetailScreen extends ConsumerWidget {
                 child: Stack(
                   children: [
                     // Cover background
-                    Container(
+                    SizedBox(
                       width: double.infinity,
                       height: coverH,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [
-                            Color.lerp(coverColor, Colors.white, 0.15)!,
-                            coverColor,
-                            Color.lerp(coverColor, Colors.black, 0.25)!,
-                          ],
-                        ),
-                      ),
-                      child: Stack(
-                        children: [
-                          // Decorative circles
-                          Positioned(
-                            top: -40,
-                            left: -40,
-                            child: _DecorCircle(
-                              size: 160,
-                              opacity: isDark ? 0.08 : 0.12,
+                      child: BookCoverImage(
+                        imageUrl: book.coverImageUrl,
+                        illustration: Container(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                Color.lerp(coverColor, Colors.white, 0.15)!,
+                                coverColor,
+                                Color.lerp(coverColor, Colors.black, 0.25)!,
+                              ],
                             ),
                           ),
-                          Positioned(
-                            bottom: -30,
-                            right: -30,
-                            child: _DecorCircle(
-                              size: 140,
-                              opacity: isDark ? 0.06 : 0.10,
-                            ),
-                          ),
-                          // Book title on cover
-                          Center(
-                            child: Padding(
-                              padding: EdgeInsets.symmetric(
-                                horizontal: hPad + 20,
+                          child: Stack(
+                            children: [
+                              // Decorative circles
+                              Positioned(
+                                top: -40,
+                                left: -40,
+                                child: _DecorCircle(
+                                  size: 160,
+                                  opacity: isDark ? 0.08 : 0.12,
+                                ),
                               ),
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text(
-                                    book.title.toUpperCase(),
-                                    textAlign: TextAlign.center,
-                                    style: GoogleFonts.playfairDisplay(
-                                      fontSize: screenW > 600 ? 42 : 34,
-                                      fontWeight: FontWeight.w900,
-                                      color: textOnCover,
-                                      height: 1.1,
-                                      letterSpacing: 1.5,
-                                    ),
+                              Positioned(
+                                bottom: -30,
+                                right: -30,
+                                child: _DecorCircle(
+                                  size: 140,
+                                  opacity: isDark ? 0.06 : 0.10,
+                                ),
+                              ),
+                              // Book title on cover
+                              Center(
+                                child: Padding(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: hPad + 20,
                                   ),
-                                  const SizedBox(height: 10),
-                                  Text(
-                                    book.author.toUpperCase(),
-                                    textAlign: TextAlign.center,
-                                    style: GoogleFonts.lato(
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.w600,
-                                      color: textOnCover.withValues(
-                                        alpha: 0.75,
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        book.title.toUpperCase(),
+                                        textAlign: TextAlign.center,
+                                        style: GoogleFonts.playfairDisplay(
+                                          fontSize: screenW > 600 ? 42 : 34,
+                                          fontWeight: FontWeight.w900,
+                                          color: textOnCover,
+                                          height: 1.1,
+                                          letterSpacing: 1.5,
+                                        ),
                                       ),
-                                      letterSpacing: 2.5,
-                                    ),
+                                      const SizedBox(height: 10),
+                                      Text(
+                                        book.author.toUpperCase(),
+                                        textAlign: TextAlign.center,
+                                        style: GoogleFonts.lato(
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.w600,
+                                          color: textOnCover.withValues(
+                                            alpha: 0.75,
+                                          ),
+                                          letterSpacing: 2.5,
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                ],
+                                ),
                               ),
-                            ),
+                            ],
                           ),
-                        ],
+                        ),
                       ),
                     ),
 

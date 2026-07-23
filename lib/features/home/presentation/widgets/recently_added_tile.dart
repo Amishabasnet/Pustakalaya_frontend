@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pustakalaya/core/constants/app_colors.dart';
 import 'package:pustakalaya/core/router/app_router.dart';
+import 'package:pustakalaya/core/widgets/book_cover_image.dart';
 import 'package:pustakalaya/features/book_detail/presentation/providers/book_detail_provider.dart';
 import 'package:pustakalaya/features/home/domain/entities/book_entity.dart';
 import 'package:pustakalaya/features/wishlist/presentation/providers/wishlist_provider.dart';
@@ -50,41 +51,46 @@ class RecentlyAddedTile extends ConsumerWidget {
             // Small cover
             ClipRRect(
               borderRadius: BorderRadius.circular(10),
-              child: Container(
+              child: SizedBox(
                 width: 70,
                 height: 90,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      _coverColor,
-                      Color.lerp(_coverColor, Colors.black, 0.3)!,
-                    ],
-                  ),
-                ),
-                child: Stack(
-                  children: [
-                    // Spine
-                    Container(
-                      width: 6,
-                      color: Colors.black.withValues(alpha: 0.18),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(10, 10, 6, 8),
-                      child: Text(
-                        book.title,
-                        style: GoogleFonts.lato(
-                          fontSize: 9,
-                          fontWeight: FontWeight.w800,
-                          color: Colors.white,
-                          height: 1.3,
-                        ),
-                        maxLines: 4,
-                        overflow: TextOverflow.ellipsis,
+                child: BookCoverImage(
+                  imageUrl: book.coverImageUrl,
+                  illustration: Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          _coverColor,
+                          Color.lerp(_coverColor, Colors.black, 0.3)!,
+                        ],
                       ),
                     ),
-                  ],
+                    child: Stack(
+                      children: [
+                        // Spine
+                        Container(
+                          width: 6,
+                          color: Colors.black.withValues(alpha: 0.18),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(10, 10, 6, 8),
+                          child: Text(
+                            book.title,
+                            style: GoogleFonts.lato(
+                              fontSize: 9,
+                              fontWeight: FontWeight.w800,
+                              color: Colors.white,
+                              height: 1.3,
+                            ),
+                            maxLines: 4,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
             ),
