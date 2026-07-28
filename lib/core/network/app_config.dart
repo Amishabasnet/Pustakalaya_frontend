@@ -22,4 +22,26 @@ class AppConfig {
 
     return 'http://127.0.0.1:$_port/api';
   }
+
+  static String get assetBaseUrl {
+    final url = baseUrl;
+    return url.endsWith('/api') ? url.substring(0, url.length - 4) : url;
+  }
+
+  static String? resolveAssetUrl(String? path) {
+    if (path == null || path.isEmpty) return null;
+
+    if (path.startsWith('http://') || path.startsWith('https://')) {
+      final uri = Uri.tryParse(path);
+      final isLoopback =
+          uri != null &&
+          (uri.host == 'localhost' ||
+              uri.host == '127.0.0.1' ||
+              uri.host == '10.0.2.2');
+      if (!isLoopback) return path;
+      return '$assetBaseUrl${uri.path}${uri.hasQuery ? '?${uri.query}' : ''}';
+    }
+
+    return '$assetBaseUrl${path.startsWith('/') ? '' : '/'}$path';
+  }
 }

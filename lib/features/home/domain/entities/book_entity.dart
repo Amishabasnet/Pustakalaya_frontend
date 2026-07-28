@@ -1,3 +1,5 @@
+import 'package:pustakalaya/core/network/app_config.dart';
+
 class BookEntity {
   final String id;
   final String title;
@@ -65,9 +67,7 @@ class BookEntity {
       genre: genreLabel.isEmpty ? 'General' : genreLabel,
       coverColor: '#$color',
       isVerified: json['isVerified'] as bool? ?? false,
-      coverImageUrl: (json['coverImage'] as String?)?.isNotEmpty == true
-          ? json['coverImage'] as String
-          : null,
+      coverImageUrl: AppConfig.resolveAssetUrl(json['coverImage'] as String?),
       originalPrice: (json['originalPrice'] as num?)?.toDouble(),
       stock: (json['stock'] as num?)?.toInt() ?? 0,
     );

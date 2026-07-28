@@ -61,6 +61,7 @@ class CheckoutScreen extends ConsumerStatefulWidget {
 
 class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
   final _addressController = TextEditingController();
+  bool _prefilledFromProfile = false;
 
   @override
   void dispose() {
@@ -68,8 +69,26 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
     super.dispose();
   }
 
+  /// Pre-fills the delivery address with the user's saved default address
+  /// (the one set on the Profile / Edit Profile screen) so they don't have
+  /// to retype it on every order. Only runs once, and only if the user
+  /// hasn't already typed something into the field themselves.
+  void _prefillAddressIfNeeded(String? savedAddress) {
+    if (_prefilledFromProfile) return;
+    if (savedAddress == null || savedAddress.trim().isEmpty) return;
+    if (_addressController.text.trim().isNotEmpty) return;
+
+    _prefilledFromProfile = true;
+    _addressController.text = savedAddress;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      ref.read(checkoutProvider.notifier).setAddress(savedAddress);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    _prefillAddressIfNeeded(ref.watch(profileProvider).address);
     final state = ref.watch(checkoutProvider);
     final mq = MediaQuery.of(context);
     final screenW = mq.size.width;
@@ -402,6 +421,30 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
       // Without this it'd keep showing the pre-order count (e.g. "0")
       // until the app restarted.
       unawaited(ref.read(profileProvider.notifier).refresh());
+
+      // Whatever address the user actually placed this order with becomes
+      // their new saved/default address, so next time they check out it's
+      // pre-filled with the most recently used one rather than whatever
+      // was saved before. Fire-and-forget — it shouldn't block or fail the
+      // order confirmation if this update itself has a hiccup.
+      if (rawAddress.isNotEmpty && rawAddress != (profile.address ?? '')) {
+        unawaited(
+          ref
+              .read(profileProvider.notifier)
+              .updateProfile(
+                name: profile.name,
+                email: profile.email,
+                phoneNumber: profile.phoneNumber,
+                username: profile.username,
+                address: rawAddress,
+              )
+              .catchError((_) {
+                // Saving the new default address is a nice-to-have; the
+                // order itself already succeeded, so swallow any failure
+                // here instead of surfacing a confusing second error.
+              }),
+        );
+      }
 
       if (!context.mounted) return true;
       context.go(
